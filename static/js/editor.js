@@ -8,12 +8,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingOverlay = document.getElementById('loadingOverlay');
 
     const sliders = {
-        brightness: { el: document.getElementById('brightness'), value: 1.0 },
-        contrast: { el: document.getElementById('contrast'), value: 1.0 },
-        saturation: { el: document.getElementById('saturation'), value: 1.0 },
-        red: { el: document.getElementById('red'), value: 1.0 },
-        green: { el: document.getElementById('green'), value: 1.0 },
-        blue: { el: document.getElementById('blue'), value: 1.0 }
+        exposure: { el: document.getElementById('exposure'), value: 0.00 },
+        brightness: { el: document.getElementById('brightness'), value: 1.00 },
+        contrast: { el: document.getElementById('contrast'), value: 1.00 },
+        highlights: { el: document.getElementById('highlights'), value: 0.00 },
+        shadows: { el: document.getElementById('shadows'), value: 0.00 },
+        whites: { el: document.getElementById('whites'), value: 0.00 },
+        blacks: { el: document.getElementById('blacks'), value: 0.00 },
+        temperature: { el: document.getElementById('temperature'), value: 0.00 },
+        tint: { el: document.getElementById('tint'), value: 0.00 },
+        vibrance: { el: document.getElementById('vibrance'), value: 0.00 },
+        saturation: { el: document.getElementById('saturation'), value: 1.00 },
+        clarity: { el: document.getElementById('clarity'), value: 0.00 },
+        dehaze: { el: document.getElementById('dehaze'), value: 0.00 },
+        red: { el: document.getElementById('red'), value: 1.00 },
+        green: { el: document.getElementById('green'), value: 1.00 },
+        blue: { el: document.getElementById('blue'), value: 1.00 }
     };
 
     let originalImage = null;
@@ -30,9 +40,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function saveState() {
         const state = {
+            exposure: sliders.exposure.value,
             brightness: sliders.brightness.value,
             contrast: sliders.contrast.value,
+            highlights: sliders.highlights.value,
+            shadows: sliders.shadows.value,
+            whites: sliders.whites.value,
+            blacks: sliders.blacks.value,
+            temperature: sliders.temperature.value,
+            tint: sliders.tint.value,
+            vibrance: sliders.vibrance.value,
             saturation: sliders.saturation.value,
+            clarity: sliders.clarity.value,
+            dehaze: sliders.dehaze.value,
             red: sliders.red.value,
             green: sliders.green.value,
             blue: sliders.blue.value,
@@ -69,7 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.keys(sliders).forEach(key => {
             sliders[key].value = state[key];
             sliders[key].el.value = state[key];
-            sliders[key].el.nextElementSibling.textContent = state[key].toFixed(2);
+            const valueDisplay = sliders[key].el.nextElementSibling;
+            if (valueDisplay && valueDisplay.classList.contains('value')) {
+                valueDisplay.textContent = state[key].toFixed(2);
+            }
         });
 
         rotation = state.rotation;
@@ -358,7 +381,10 @@ document.addEventListener('DOMContentLoaded', () => {
             `);
         }
 
-        ctx.filter = `url(#colorBalance) brightness(${sliders.brightness.value}) contrast(${sliders.contrast.value}) saturate(${sliders.saturation.value})`;
+        // Update CSS filters for real-time preview (approximation)
+        // Exposure can be approximated by brightness boost/cut
+        const exposureBrightness = Math.pow(2, sliders.exposure.value);
+        ctx.filter = `url(#colorBalance) brightness(${sliders.brightness.value * exposureBrightness}) contrast(${sliders.contrast.value}) saturate(${sliders.saturation.value})`;
         
         ctx.save();
         ctx.translate(mainCanvas.width / 2, mainCanvas.height / 2);
@@ -414,9 +440,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     settings: {
+                        exposure: sliders.exposure.value,
                         brightness: sliders.brightness.value,
                         contrast: sliders.contrast.value,
+                        highlights: sliders.highlights.value,
+                        shadows: sliders.shadows.value,
+                        whites: sliders.whites.value,
+                        blacks: sliders.blacks.value,
+                        temperature: sliders.temperature.value,
+                        tint: sliders.tint.value,
+                        vibrance: sliders.vibrance.value,
                         saturation: sliders.saturation.value,
+                        clarity: sliders.clarity.value,
+                        dehaze: sliders.dehaze.value,
                         red: sliders.red.value,
                         green: sliders.green.value,
                         blue: sliders.blue.value,

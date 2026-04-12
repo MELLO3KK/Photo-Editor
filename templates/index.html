@@ -22,7 +22,12 @@
 
             <div class="controls-scroll">
                 <section class="control-group">
-                    <h3>Basic Adjustments</h3>
+                    <h3>Light</h3>
+                    <div class="control">
+                        <label for="exposure">Exposure</label>
+                        <input type="range" id="exposure" min="-2" max="2" step="0.01" value="0">
+                        <span class="value">0.00</span>
+                    </div>
                     <div class="control">
                         <label for="brightness">Brightness</label>
                         <input type="range" id="brightness" min="0" max="2" step="0.01" value="1">
@@ -34,12 +39,50 @@
                         <span class="value">1.0</span>
                     </div>
                     <div class="control">
+                        <label for="highlights">Highlights</label>
+                        <input type="range" id="highlights" min="-1" max="1" step="0.01" value="0">
+                        <span class="value">0.00</span>
+                    </div>
+                    <div class="control">
+                        <label for="shadows">Shadows</label>
+                        <input type="range" id="shadows" min="-1" max="1" step="0.01" value="0">
+                        <span class="value">0.00</span>
+                    </div>
+                    <div class="control">
+                        <label for="whites">Whites</label>
+                        <input type="range" id="whites" min="-1" max="1" step="0.01" value="0">
+                        <span class="value">0.00</span>
+                    </div>
+                    <div class="control">
+                        <label for="blacks">Blacks</label>
+                        <input type="range" id="blacks" min="-1" max="1" step="0.01" value="0">
+                        <span class="value">0.00</span>
+                    </div>
+                </section>
+
+                <section class="control-group">
+                    <h3>Color</h3>
+                    <div class="control">
+                        <label for="temperature">Temperature</label>
+                        <input type="range" id="temperature" min="-1" max="1" step="0.01" value="0">
+                        <span class="value">0.00</span>
+                    </div>
+                    <div class="control">
+                        <label for="tint">Tint</label>
+                        <input type="range" id="tint" min="-1" max="1" step="0.01" value="0">
+                        <span class="value">0.00</span>
+                    </div>
+                    <div class="control">
+                        <label for="vibrance">Vibrance</label>
+                        <input type="range" id="vibrance" min="-1" max="1" step="0.01" value="0">
+                        <span class="value">0.00</span>
+                    </div>
+                    <div class="control">
                         <label for="saturation">Saturation</label>
                         <input type="range" id="saturation" min="0" max="2" step="0.01" value="1">
                         <span class="value">1.0</span>
                     </div>
-                <section class="control-group">
-                    <h3>Color Balance</h3>
+                    <div class="control-divider">RGB Channels</div>
                     <div class="control">
                         <label for="red">Red</label>
                         <input type="range" id="red" min="0" max="2" step="0.01" value="1">
@@ -54,6 +97,20 @@
                         <label for="blue">Blue</label>
                         <input type="range" id="blue" min="0" max="2" step="0.01" value="1">
                         <span class="value">1.0</span>
+                    </div>
+                </section>
+
+                <section class="control-group">
+                    <h3>Presence</h3>
+                    <div class="control">
+                        <label for="clarity">Clarity</label>
+                        <input type="range" id="clarity" min="-1" max="1" step="0.01" value="0">
+                        <span class="value">0.00</span>
+                    </div>
+                    <div class="control">
+                        <label for="dehaze">Dehaze</label>
+                        <input type="range" id="dehaze" min="-1" max="1" step="0.01" value="0">
+                        <span class="value">0.00</span>
                     </div>
                 </section>
 

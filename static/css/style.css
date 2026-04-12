@@ -70,9 +70,19 @@ body {
 .control-group h3 {
     font-size: 0.85rem;
     text-transform: uppercase;
-    color: var(--text-secondary);
-    margin-bottom: 16px;
     letter-spacing: 0.5px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #333;
+}
+
+.control-divider {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin: 24px 0 16px 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #222;
+    padding-bottom: 4px;
 }
 
 .control {

@@ -7,25 +7,100 @@ class ImageProcessor:
     @staticmethod
     def apply_adjustments(image_path, settings):
         """
-        Apply adjustments like brightness, contrast, etc.
-        settings: dict containing adjustment values
+        Apply professional adjustments using NumPy and PIL.
         """
         img = Image.open(image_path)
+        if img.mode != 'RGB':
+            img = img.convert('RGB')
         
-        # Brightness
-        if 'brightness' in settings:
+        # Convert to NumPy array for advanced processing (float32 for precision)
+        arr = np.array(img).astype(np.float32) / 255.0
+
+        # --- 1. Exposure ---
+        if 'exposure' in settings and settings['exposure'] != 0:
+            # exposure is usually in stops: pixels * 2^exposure
+            arr = arr * (2 ** settings['exposure'])
+
+        # --- 2. WB: Temperature & Tint ---
+        # Temperature (Blue-Yellow): -1 to 1
+        if 'temperature' in settings and settings['temperature'] != 0:
+            temp = settings['temperature']
+            if temp > 0: # Warmer (Yellow/Red)
+                arr[:,:,0] += temp * 0.1 # Red
+                arr[:,:,2] -= temp * 0.1 # Blue
+            else: # Cooler (Blue)
+                arr[:,:,0] += temp * 0.1
+                arr[:,:,2] -= temp * 0.1
+        
+        # Tint (Green-Magenta): -1 to 1
+        if 'tint' in settings and settings['tint'] != 0:
+            tint = settings['tint']
+            arr[:,:,1] -= tint * 0.05 # Green channel
+
+        # --- 3. Light: Highlights, Shadows, Whites, Blacks ---
+        # Calculate luminance (standard coefficients)
+        lumi = 0.299 * arr[:,:,0] + 0.587 * arr[:,:,1] + 0.114 * arr[:,:,2]
+        lumi = np.stack([lumi, lumi, lumi], axis=-1)
+
+        # Highlights & Shadows
+        if 'highlights' in settings and settings['highlights'] != 0:
+            h_mask = np.clip((lumi - 0.5) * 2, 0, 1)
+            arr = arr + h_mask * (settings['highlights'] * 0.2)
+            
+        if 'shadows' in settings and settings['shadows'] != 0:
+            s_mask = np.clip((0.5 - lumi) * 2, 0, 1)
+            arr = arr + s_mask * (settings['shadows'] * 0.2)
+
+        # Whites & Blacks
+        if 'whites' in settings and settings['whites'] != 0:
+            arr = arr + (lumi > 0.7) * (settings['whites'] * 0.1)
+        if 'blacks' in settings and settings['blacks'] != 0:
+            arr = arr + (lumi < 0.3) * (settings['blacks'] * 0.1)
+
+        # Clip after additions
+        arr = np.clip(arr, 0, 1)
+
+        # --- 4. Presence: Vibrance, Clarity, Dehaze ---
+        # Convert back to uint8 for some PIL ops or continue in NP
+        img = Image.fromarray((arr * 255).astype(np.uint8))
+
+        # Brightness (Original)
+        if 'brightness' in settings and settings['brightness'] != 1.0:
             enhancer = ImageEnhance.Brightness(img)
             img = enhancer.enhance(settings['brightness'])
             
-        # Contrast
-        if 'contrast' in settings:
+        # Contrast (Original)
+        if 'contrast' in settings and settings['contrast'] != 1.0:
             enhancer = ImageEnhance.Contrast(img)
             img = enhancer.enhance(settings['contrast'])
             
-        # Color (Saturation)
-        if 'saturation' in settings:
+        # Saturation (Original)
+        if 'saturation' in settings and settings['saturation'] != 1.0:
             enhancer = ImageEnhance.Color(img)
             img = enhancer.enhance(settings['saturation'])
+
+        # Vibrance (Smart Saturation)
+        if 'vibrance' in settings and settings['vibrance'] != 0:
+            arr_v = np.array(img).astype(np.float32) / 255.0
+            hsv = cv2.cvtColor(arr_v, cv2.COLOR_RGB2HSV)
+            sat = hsv[:,:,1]
+            vibrance = settings['vibrance']
+            hsv[:,:,1] = np.clip(sat + (vibrance * (1.0 - sat) * 0.5), 0, 1)
+            arr_v = cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)
+            img = Image.fromarray((arr_v * 255).astype(np.uint8))
+
+        # Clarity (Local Contrast)
+        if 'clarity' in settings and settings['clarity'] != 0:
+            arr_c = np.array(img)
+            blur = cv2.GaussianBlur(arr_c, (0, 0), 10)
+            img = Image.fromarray(cv2.addWeighted(arr_c, 1 + settings['clarity']*0.5, blur, -settings['clarity']*0.5, 0))
+
+        # Dehaze
+        if 'dehaze' in settings and settings['dehaze'] != 0:
+            enhancer_c = ImageEnhance.Contrast(img)
+            img = enhancer_c.enhance(1.0 + settings['dehaze'] * 0.2)
+            enhancer_s = ImageEnhance.Color(img)
+            img = enhancer_s.enhance(1.0 + settings['dehaze'] * 0.1)
 
         # RGB Channel Gains
         if any(k in settings for k in ['red', 'green', 'blue']):
@@ -33,9 +108,6 @@ class ImageProcessor:
             g_gain = settings.get('green', 1.0)
             b_gain = settings.get('blue', 1.0)
             
-            if img.mode != 'RGB':
-                img = img.convert('RGB')
-                
             r, g, b = img.split()
             r = r.point(lambda i: i * r_gain)
             g = g.point(lambda i: i * g_gain)
@@ -49,7 +121,6 @@ class ImageProcessor:
         # Crop (x, y, w, h)
         if 'crop' in settings and settings['crop']:
             crop = settings['crop']
-            # Crop parameters are relative to the rotated image
             x, y, w, h = int(crop['x']), int(crop['y']), int(crop['width']), int(crop['height'])
             img = img.crop((x, y, x + w, y + h))
 

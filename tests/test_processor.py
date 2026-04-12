@@ -4,8 +4,8 @@ from PIL import Image
 from processor import ImageProcessor
 
 def test_image_adjustments():
-    # Create a dummy image
-    img = Image.new('RGB', (100, 100), color='red')
+    # Create a dummy gray image (mid-tone)
+    img = Image.new('RGB', (100, 100), color=(128, 128, 128))
     img_path = 'test_img.jpg'
     img.save(img_path)
     
@@ -14,8 +14,34 @@ def test_image_adjustments():
         processed = ImageProcessor.apply_adjustments(img_path, settings)
         
         assert processed.size == (100, 100)
-        # Check if actually different (hard to check exact values without deep pixel analysis)
+        # Check if actually different
         assert processed.getpixel((0,0)) != img.getpixel((0,0))
+    finally:
+        if os.path.exists(img_path):
+            os.remove(img_path)
+
+def test_advanced_adjustments():
+    img = Image.new('RGB', (100, 100), color=(128, 128, 128))
+    img_path = 'test_adv.jpg'
+    img.save(img_path)
+    
+    try:
+        # Test Exposure
+        settings = {'exposure': 1.0}
+        processed = ImageProcessor.apply_adjustments(img_path, settings)
+        assert processed.getpixel((0,0))[0] > 128
+
+        # Test Temperature
+        settings = {'temperature': 0.5}
+        processed = ImageProcessor.apply_adjustments(img_path, settings)
+        r, g, b = processed.getpixel((0,0))
+        assert r > b # Warmer shifts red up, blue down
+
+        # Test Clarity
+        settings = {'clarity': 1.0}
+        processed = ImageProcessor.apply_adjustments(img_path, settings)
+        assert processed.size == (100, 100)
+        
     finally:
         if os.path.exists(img_path):
             os.remove(img_path)
