@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PhotoEditor | Pro Image Adjustments</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Sidebar Controls -->
+        <aside class="sidebar">
+            <div class="brand">
+                <h1>Photo<span>Editor</span></h1>
+            </div>
+            
+            <div class="upload-section">
+                <input type="file" id="imageInput" accept="image/*" hidden>
+                <button id="uploadBtn" class="primary-btn">Import Image</button>
+            </div>
+
+            <div class="controls-scroll">
+                <section class="control-group">
+                    <h3>Basic Adjustments</h3>
+                    <div class="control">
+                        <label for="brightness">Brightness</label>
+                        <input type="range" id="brightness" min="0" max="2" step="0.01" value="1">
+                        <span class="value">1.0</span>
+                    </div>
+                    <div class="control">
+                        <label for="contrast">Contrast</label>
+                        <input type="range" id="contrast" min="0" max="2" step="0.01" value="1">
+                        <span class="value">1.0</span>
+                    </div>
+                    <div class="control">
+                        <label for="saturation">Saturation</label>
+                        <input type="range" id="saturation" min="0" max="2" step="0.01" value="1">
+                        <span class="value">1.0</span>
+                    </div>
+                </section>
+
+                <section class="control-group">
+                    <h3>Transform</h3>
+                    <div class="btn-grid">
+                        <button id="rotateLeft" class="icon-btn">Rotate L</button>
+                        <button id="rotateRight" class="icon-btn">Rotate R</button>
+                    </div>
+                </section>
+
+                <section class="control-group">
+                    <h3>Crop Settings</h3>
+                    <div class="control">
+                        <label for="aspectRatio">Aspect Ratio</label>
+                        <select id="aspectRatio" class="custom-select">
+                            <option value="free">Freeform</option>
+                            <option value="1:1">1:1 Square</option>
+                            <option value="4:3">4:3 Standard</option>
+                            <option value="16:9">16:9 Widescreen</option>
+                        </select>
+                    </div>
+                    <div class="btn-grid">
+                        <button id="cropBtn" class="icon-btn">Start Crop</button>
+                        <button id="resetCrop" class="icon-btn" disabled>Reset Crop</button>
+                    </div>
+                </section>
+
+                <section class="control-group">
+                    <h3>History</h3>
+                    <div class="btn-grid">
+                        <button id="undoBtn" disabled>Undo</button>
+                        <button id="redoBtn" disabled>Redo</button>
+                    </div>
+                </section>
+            </div>
+
+            <div class="export-section">
+                <button id="exportBtn" class="secondary-btn" disabled>Export Image</button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="workspace">
+            <div id="canvasContainer" class="canvas-container">
+                <div id="dropZone" class="drop-zone">
+                    <p>Drag & Drop an image here or click Import</p>
+                </div>
+                <canvas id="mainCanvas"></canvas>
+            </div>
+            
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="loader"></div>
+                <p>Processing...</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/editor.js') }}"></script>
+</body>
+</html>
