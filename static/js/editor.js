@@ -10,7 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const sliders = {
         brightness: { el: document.getElementById('brightness'), value: 1.0 },
         contrast: { el: document.getElementById('contrast'), value: 1.0 },
-        saturation: { el: document.getElementById('saturation'), value: 1.0 }
+        saturation: { el: document.getElementById('saturation'), value: 1.0 },
+        red: { el: document.getElementById('red'), value: 1.0 },
+        green: { el: document.getElementById('green'), value: 1.0 },
+        blue: { el: document.getElementById('blue'), value: 1.0 }
     };
 
     let originalImage = null;
@@ -30,6 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
             brightness: sliders.brightness.value,
             contrast: sliders.contrast.value,
             saturation: sliders.saturation.value,
+            red: sliders.red.value,
+            green: sliders.green.value,
+            blue: sliders.blue.value,
             rotation: rotation,
             crop: currentCrop
         };
@@ -60,17 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applyState(state) {
-        sliders.brightness.value = state.brightness;
-        sliders.brightness.el.value = state.brightness;
-        sliders.brightness.el.nextElementSibling.textContent = state.brightness.toFixed(1);
-
-        sliders.contrast.value = state.contrast;
-        sliders.contrast.el.value = state.contrast;
-        sliders.contrast.el.nextElementSibling.textContent = state.contrast.toFixed(1);
-
-        sliders.saturation.value = state.saturation;
-        sliders.saturation.el.value = state.saturation;
-        sliders.saturation.el.nextElementSibling.textContent = state.saturation.toFixed(1);
+        Object.keys(sliders).forEach(key => {
+            sliders[key].value = state[key];
+            sliders[key].el.value = state[key];
+            sliders[key].el.nextElementSibling.textContent = state[key].toFixed(2);
+        });
 
         rotation = state.rotation;
         currentCrop = state.crop;
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sliders[key].el.addEventListener('input', (e) => {
             const val = parseFloat(e.target.value);
             sliders[key].value = val;
-            e.target.nextElementSibling.textContent = val.toFixed(1);
+            e.target.nextElementSibling.textContent = val.toFixed(2);
             render();
         });
         
@@ -346,7 +346,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-        ctx.filter = `brightness(${sliders.brightness.value}) contrast(${sliders.contrast.value}) saturate(${sliders.saturation.value})`;
+        
+        // Update SVG filter matrix
+        const colorMatrix = document.getElementById('colorMatrix');
+        if (colorMatrix) {
+            colorMatrix.setAttribute('values', `
+                ${sliders.red.value} 0 0 0 0
+                0 ${sliders.green.value} 0 0 0
+                0 0 ${sliders.blue.value} 0 0
+                0 0 0 1 0
+            `);
+        }
+
+        ctx.filter = `url(#colorBalance) brightness(${sliders.brightness.value}) contrast(${sliders.contrast.value}) saturate(${sliders.saturation.value})`;
         
         ctx.save();
         ctx.translate(mainCanvas.width / 2, mainCanvas.height / 2);
@@ -405,6 +417,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         brightness: sliders.brightness.value,
                         contrast: sliders.contrast.value,
                         saturation: sliders.saturation.value,
+                        red: sliders.red.value,
+                        green: sliders.green.value,
+                        blue: sliders.blue.value,
                         rotation: rotation,
                         crop: currentCrop
                     }

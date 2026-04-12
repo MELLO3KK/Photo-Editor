@@ -26,6 +26,21 @@ class ImageProcessor:
         if 'saturation' in settings:
             enhancer = ImageEnhance.Color(img)
             img = enhancer.enhance(settings['saturation'])
+
+        # RGB Channel Gains
+        if any(k in settings for k in ['red', 'green', 'blue']):
+            r_gain = settings.get('red', 1.0)
+            g_gain = settings.get('green', 1.0)
+            b_gain = settings.get('blue', 1.0)
+            
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+                
+            r, g, b = img.split()
+            r = r.point(lambda i: i * r_gain)
+            g = g.point(lambda i: i * g_gain)
+            b = b.point(lambda i: i * b_gain)
+            img = Image.merge('RGB', (r, g, b))
             
         # Rotation
         if 'rotation' in settings and settings['rotation'] != 0:

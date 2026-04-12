@@ -38,7 +38,25 @@
                         <input type="range" id="saturation" min="0" max="2" step="0.01" value="1">
                         <span class="value">1.0</span>
                     </div>
+                <section class="control-group">
+                    <h3>Color Balance</h3>
+                    <div class="control">
+                        <label for="red">Red</label>
+                        <input type="range" id="red" min="0" max="2" step="0.01" value="1">
+                        <span class="value">1.0</span>
+                    </div>
+                    <div class="control">
+                        <label for="green">Green</label>
+                        <input type="range" id="green" min="0" max="2" step="0.01" value="1">
+                        <span class="value">1.0</span>
+                    </div>
+                    <div class="control">
+                        <label for="blue">Blue</label>
+                        <input type="range" id="blue" min="0" max="2" step="0.01" value="1">
+                        <span class="value">1.0</span>
+                    </div>
                 </section>
+
 
                 <section class="control-group">
                     <h3>Transform</h3>
@@ -77,6 +95,16 @@
             <div class="export-section">
                 <button id="exportBtn" class="secondary-btn" disabled>Export Image</button>
             </div>
+    
+    <svg style="display: none;">
+        <filter id="colorBalance">
+            <feColorMatrix id="colorMatrix" type="matrix" values="1 0 0 0 0
+                                                               0 1 0 0 0
+                                                               0 0 1 0 0
+                                                               0 0 0 1 0" />
+        </filter>
+    </svg>
+
         </aside>
 
         <!-- Main Workspace -->
