@@ -21,9 +21,9 @@ def allowed_file(filename):
 def index():
     # Get settings from query parameters for the Python-only preview
     settings = {
-        'brightness': request.args.get('brightness', '1'),
-        'contrast': request.args.get('contrast', '1'),
-        'saturation': request.args.get('saturation', '1'),
+        'brightness': request.args.get('brightness', '200'),
+        'contrast': request.args.get('contrast', '200'),
+        'saturation': request.args.get('saturation', '200'),
         'exposure': request.args.get('exposure', '0'),
         'temperature': request.args.get('temperature', '0'),
         'tint': request.args.get('tint', '0'),
@@ -34,9 +34,9 @@ def index():
         'vibrance': request.args.get('vibrance', '0'),
         'clarity': request.args.get('clarity', '0'),
         'dehaze': request.args.get('dehaze', '0'),
-        'red': request.args.get('red', '1'),
-        'green': request.args.get('green', '1'),
-        'blue': request.args.get('blue', '1'),
+        'red': request.args.get('red', '500'),
+        'green': request.args.get('green', '500'),
+        'blue': request.args.get('blue', '500'),
     }
     
     # Generate preview URL if there is an original file in session
@@ -105,9 +105,9 @@ def preview_image():
         
     # Extract settings from query parameters
     settings = {
-        'brightness': float(request.args.get('brightness', 1.0)),
-        'contrast': float(request.args.get('contrast', 1.0)),
-        'saturation': float(request.args.get('saturation', 1.0)),
+        'brightness': float(request.args.get('brightness', 200.0)),
+        'contrast': float(request.args.get('contrast', 200.0)),
+        'saturation': float(request.args.get('saturation', 200.0)),
         'exposure': float(request.args.get('exposure', 0.0)),
         'temperature': float(request.args.get('temperature', 0.0)),
         'tint': float(request.args.get('tint', 0.0)),
@@ -118,9 +118,9 @@ def preview_image():
         'vibrance': float(request.args.get('vibrance', 0.0)),
         'clarity': float(request.args.get('clarity', 0.0)),
         'dehaze': float(request.args.get('dehaze', 0.0)),
-        'red': float(request.args.get('red', 1.0)),
-        'green': float(request.args.get('green', 1.0)),
-        'blue': float(request.args.get('blue', 1.0)),
+        'red': float(request.args.get('red', 500.0)),
+        'green': float(request.args.get('green', 500.0)),
+        'blue': float(request.args.get('blue', 500.0)),
     }
     
     original_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)

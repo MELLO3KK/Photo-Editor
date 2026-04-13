@@ -10,17 +10,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearWorkspaceBtn = document.getElementById('clearWorkspaceBtn');
 
     const sliders = {
-        exposure: { el: document.getElementById('exposure'), slider: document.getElementById('exposure_slider'), value: 0.00 },
-        brightness: { el: document.getElementById('brightness'), slider: document.getElementById('brightness_slider'), value: 1.00 },
-        contrast: { el: document.getElementById('contrast'), slider: document.getElementById('contrast_slider'), value: 1.00 },
-        highlights: { el: document.getElementById('highlights'), slider: document.getElementById('highlights_slider'), value: 0.00 },
-        shadows: { el: document.getElementById('shadows'), slider: document.getElementById('shadows_slider'), value: 0.00 },
-        temperature: { el: document.getElementById('temperature'), slider: document.getElementById('temperature_slider'), value: 0.00 },
-        vibrance: { el: document.getElementById('vibrance'), slider: document.getElementById('vibrance_slider'), value: 0.00 },
-        saturation: { el: document.getElementById('saturation'), slider: document.getElementById('saturation_slider'), value: 1.00 },
-        red: { el: document.getElementById('red'), value: 1.00 },
-        green: { el: document.getElementById('green'), value: 1.00 },
-        blue: { el: document.getElementById('blue'), value: 1.00 }
+        exposure: { el: document.getElementById('exposure'), slider: document.getElementById('exposure_slider'), value: 0 },
+        brightness: { el: document.getElementById('brightness'), slider: document.getElementById('brightness_slider'), value: 200 },
+        contrast: { el: document.getElementById('contrast'), slider: document.getElementById('contrast_slider'), value: 200 },
+        highlights: { el: document.getElementById('highlights'), slider: document.getElementById('highlights_slider'), value: 0 },
+        shadows: { el: document.getElementById('shadows'), slider: document.getElementById('shadows_slider'), value: 0 },
+        temperature: { el: document.getElementById('temperature'), slider: document.getElementById('temperature_slider'), value: 0 },
+        vibrance: { el: document.getElementById('vibrance'), slider: document.getElementById('vibrance_slider'), value: 0 },
+        saturation: { el: document.getElementById('saturation'), slider: document.getElementById('saturation_slider'), value: 200 },
+        red: { el: document.getElementById('red'), value: 500 },
+        green: { el: document.getElementById('green'), value: 500 },
+        blue: { el: document.getElementById('blue'), value: 500 }
     };
 
     let originalImage = null;
@@ -88,12 +88,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyState(state) {
         Object.keys(sliders).forEach(key => {
             sliders[key].value = state[key];
-            if (sliders[key].el) sliders[key].el.value = state[key].toFixed(2);
+            if (sliders[key].el) sliders[key].el.value = Math.round(state[key]);
             if (sliders[key].slider) sliders[key].slider.value = state[key];
             
             // Update value span if exists
             const valSpan = document.getElementById(`val-${key}`);
-            if (valSpan) valSpan.textContent = state[key].toFixed(2);
+            if (valSpan) valSpan.textContent = Math.round(state[key]);
         });
 
         rotation = state.rotation;
@@ -247,9 +247,9 @@ document.addEventListener('DOMContentLoaded', () => {
             config.slider.addEventListener('input', (e) => {
                 const val = parseFloat(e.target.value);
                 config.value = val;
-                if (config.el) config.el.value = val.toFixed(2);
+                if (config.el) config.el.value = Math.round(val);
                 const valSpan = document.getElementById(`val-${key}`);
-                if (valSpan) valSpan.textContent = val.toFixed(2);
+                if (valSpan) valSpan.textContent = Math.round(val);
                 render();
             });
             
@@ -264,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     config.value = val;
                     if (config.slider) config.slider.value = val;
                     const valSpan = document.getElementById(`val-${key}`);
-                    if (valSpan) valSpan.textContent = val.toFixed(2);
+                    if (valSpan) valSpan.textContent = Math.round(val);
                     render();
                 }
             });
@@ -291,12 +291,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!isNaN(min)) currentVal = Math.max(min, currentVal);
             if (!isNaN(max)) currentVal = Math.min(max, currentVal);
 
-            input.value = currentVal.toFixed(2);
+            input.value = Math.round(currentVal);
             sliders[targetId].value = currentVal;
             if (sliders[targetId].slider) sliders[targetId].slider.value = currentVal;
             
             const valSpan = document.getElementById(`val-${targetId}`);
-            if (valSpan) valSpan.textContent = currentVal.toFixed(2);
+            if (valSpan) valSpan.textContent = Math.round(currentVal);
             
             render();
             saveState();
@@ -462,16 +462,16 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update SVG Filter
         const colorMatrix = document.getElementById('colorMatrix');
         if (colorMatrix) {
-            let r = sliders.red.value, g = sliders.green.value, b = sliders.blue.value;
-            const temp = sliders.temperature.value;
+            let r = sliders.red.value / 500.0, g = sliders.green.value / 500.0, b = sliders.blue.value / 500.0;
+            const temp = sliders.temperature.value / 1000.0;
             if (temp > 0) { r += temp * 0.2; b -= temp * 0.2; }
             else { r += temp * 0.2; b -= temp * 0.2; }
             colorMatrix.setAttribute('values', `${r} 0 0 0 0 0 ${g} 0 0 0 0 0 ${b} 0 0 0 0 0 1 0`);
         }
 
-        const exposureBrightness = Math.pow(2, sliders.exposure.value);
-        const totalSaturation = sliders.saturation.value + (sliders.vibrance.value * 0.3);
-        ctx.filter = `url(#colorBalance) brightness(${sliders.brightness.value * exposureBrightness}) contrast(${sliders.contrast.value}) saturate(${totalSaturation})`;
+        const exposureBrightness = Math.pow(2, sliders.exposure.value / 200.0);
+        const totalSaturation = (sliders.saturation.value / 200.0) + (sliders.vibrance.value / 1000.0 * 0.3);
+        ctx.filter = `url(#colorBalance) brightness(${(sliders.brightness.value / 200.0) * exposureBrightness}) contrast(${sliders.contrast.value / 200.0}) saturate(${totalSaturation})`;
         
         ctx.save();
         if (currentCrop) {
@@ -527,29 +527,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const presetsContainer = document.getElementById('presetsContainer');
 
     const examplePresets = [
-        { "name": "Golden Hour", "settings": { "exposure": 0.2, "temperature": 0.6, "vibrance": 0.3 } },
-        { "name": "Cool B&W", "settings": { "saturation": 0, "contrast": 1.2, "temperature": -0.4 } },
-        { "name": "Vivid", "settings": { "vibrance": 0.5, "saturation": 1.2, "exposure": 0.1 } },
-        { "name": "Dark Matte", "settings": { "exposure": -0.3, "contrast": 0.8, "saturation": 0.7 } },
+        { "name": "Golden Hour", "settings": { "exposure": 40, "temperature": 600, "vibrance": 300 } },
+        { "name": "Cool B&W", "settings": { "saturation": 0, "contrast": 240, "temperature": -400 } },
+        { "name": "Vivid", "settings": { "vibrance": 500, "saturation": 240, "exposure": 20 } },
+        { "name": "Dark Matte", "settings": { "exposure": -60, "contrast": 160, "saturation": 140 } },
         {
             "name": "Comprehensive Example",
             "settings": {
-                "exposure": 0.5,
-                "brightness": 1.1,
-                "contrast": 1.2,
-                "highlights": -0.2,
-                "shadows": 0.3,
-                "whites": 0.1,
-                "blacks": -0.1,
-                "temperature": 0.4,
-                "tint": 0.1,
-                "vibrance": 0.6,
-                "saturation": 1.1,
-                "clarity": 0.2,
-                "dehaze": 0.1,
-                "red": 1.05,
-                "green": 1.0,
-                "blue": 0.95,
+                "exposure": 100,
+                "brightness": 220,
+                "contrast": 240,
+                "highlights": -200,
+                "shadows": 300,
+                "whites": 100,
+                "blacks": -100,
+                "temperature": 400,
+                "tint": 100,
+                "vibrance": 600,
+                "saturation": 220,
+                "clarity": 200,
+                "dehaze": 100,
+                "red": 525,
+                "green": 500,
+                "blue": 475,
                 "rotation": 90,
                 "crop": {
                     "x": 100,
@@ -574,7 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.className = 'preset-card';
                 card.innerHTML = `<div class="preset-icon">✨</div><h4>${preset.name}</h4>`;
                 card.addEventListener('click', () => {
-                    const defaults = { exposure: 0, brightness: 1, contrast: 1, highlights: 0, shadows: 0, temperature: 0, vibrance: 0, saturation: 1, red: 1, green: 1, blue: 1, rotation: 0, crop: null };
+                    const defaults = { exposure: 0, brightness: 200, contrast: 200, highlights: 0, shadows: 0, temperature: 0, vibrance: 0, saturation: 200, red: 500, green: 500, blue: 500, rotation: 0, crop: null };
                     applyState({ ...defaults, ...preset.settings });
                     saveState();
                 });

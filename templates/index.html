@@ -1,21 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PhotoEditor | Pro Image Adjustments</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
 </head>
+
 <body class="dark-theme">
     <div class="app-container">
         <!-- Sidebar Controls -->
         <aside class="sidebar">
             <div class="brand">
-                <div class="preset-icon" style="width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">📸</div>
+                <div class="preset-icon"
+                    style="width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
+                    📸</div>
                 <h1>Photo<span>Editor</span></h1>
             </div>
-            
+
             <div class="upload-section">
                 <input type="file" id="imageInput" accept="image/*" hidden>
                 <button id="uploadBtn" class="primary-btn">Import Image</button>
@@ -23,122 +28,152 @@
 
             <div class="controls-scroll">
                 <form id="pythonPreviewForm" method="GET" action="/">
-                <section class="control-group">
-                    <h3>Light <span>✨</span></h3>
-                    <div class="control">
-                        <label for="exposure">Exposure <span id="val-exposure">{{ settings.exposure }}</span></label>
-                        <div class="slider-container">
-                            <input type="range" id="exposure_slider" min="-5" max="5" step="0.01" value="{{ settings.exposure }}">
-                            <div class="numeric-control">
-                                <button type="button" class="step-btn dec" data-target="exposure">−</button>
-                                <input type="number" name="exposure" id="exposure" min="-5" max="5" step="0.01" value="{{ settings.exposure }}">
-                                <button type="button" class="step-btn inc" data-target="exposure">+</button>
+                    <section class="control-group">
+                        <h3>Light <span>✨</span></h3>
+                        <div class="control">
+                            <label for="exposure">Exposure <span id="val-exposure">{{ settings.exposure
+                                    }}</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="exposure_slider" min="-1000" max="1000" step="1"
+                                    value="{{ settings.exposure }}">
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn dec" data-target="exposure">−</button>
+                                    <input type="number" name="exposure" id="exposure" min="-1000" max="1000" step="1"
+                                        value="{{ settings.exposure }}">
+                                    <button type="button" class="step-btn inc" data-target="exposure">+</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="control">
-                        <label for="brightness">Brightness <span id="val-brightness">{{ settings.brightness }}</span></label>
-                        <div class="slider-container">
-                            <input type="range" id="brightness_slider" min="0" max="5" step="0.01" value="{{ settings.brightness }}">
-                            <div class="numeric-control">
-                                <button type="button" class="step-btn dec" data-target="brightness">−</button>
-                                <input type="number" name="brightness" id="brightness" min="0" max="5" step="0.01" value="{{ settings.brightness }}">
-                                <button type="button" class="step-btn inc" data-target="brightness">+</button>
+                        <div class="control">
+                            <label for="brightness">Brightness <span id="val-brightness">{{ settings.brightness
+                                    }}</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="brightness_slider" min="0" max="1000" step="1"
+                                    value="{{ settings.brightness }}">
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn dec" data-target="brightness">−</button>
+                                    <input type="number" name="brightness" id="brightness" min="0" max="1000" step="1"
+                                        value="{{ settings.brightness }}">
+                                    <button type="button" class="step-btn inc" data-target="brightness">+</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="control">
-                        <label for="contrast">Contrast <span id="val-contrast">{{ settings.contrast }}</span></label>
-                        <div class="slider-container">
-                            <input type="range" id="contrast_slider" min="0" max="5" step="0.01" value="{{ settings.contrast }}">
-                            <div class="numeric-control">
-                                <button type="button" class="step-btn dec" data-target="contrast">−</button>
-                                <input type="number" name="contrast" id="contrast" min="0" max="5" step="0.01" value="{{ settings.contrast }}">
-                                <button type="button" class="step-btn inc" data-target="contrast">+</button>
+                        <div class="control">
+                            <label for="contrast">Contrast <span id="val-contrast">{{ settings.contrast
+                                    }}</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="contrast_slider" min="0" max="1000" step="1"
+                                    value="{{ settings.contrast }}">
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn dec" data-target="contrast">−</button>
+                                    <input type="number" name="contrast" id="contrast" min="0" max="1000" step="1"
+                                        value="{{ settings.contrast }}">
+                                    <button type="button" class="step-btn inc" data-target="contrast">+</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="control">
-                        <label for="highlights">Highlights <span id="val-highlights">{{ settings.highlights }}</span></label>
-                        <div class="slider-container">
-                            <input type="range" id="highlights_slider" min="-1" max="1" step="0.01" value="{{ settings.highlights }}">
-                            <div class="numeric-control">
-                                <button type="button" class="step-btn dec" data-target="highlights">−</button>
-                                <input type="number" name="highlights" id="highlights" min="-1" max="1" step="0.01" value="{{ settings.highlights }}">
-                                <button type="button" class="step-btn inc" data-target="highlights">+</button>
+                        <div class="control">
+                            <label for="highlights">Highlights <span id="val-highlights">{{ settings.highlights
+                                    }}</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="highlights_slider" min="-1000" max="1000" step="1"
+                                    value="{{ settings.highlights }}">
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn dec" data-target="highlights">−</button>
+                                    <input type="number" name="highlights" id="highlights" min="-1000" max="1000"
+                                        step="1" value="{{ settings.highlights }}">
+                                    <button type="button" class="step-btn inc" data-target="highlights">+</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="control">
-                        <label for="shadows">Shadows <span id="val-shadows">{{ settings.shadows }}</span></label>
-                        <div class="slider-container">
-                            <input type="range" id="shadows_slider" min="-1" max="1" step="0.01" value="{{ settings.shadows }}">
-                            <div class="numeric-control">
-                                <button type="button" class="step-btn dec" data-target="shadows">−</button>
-                                <input type="number" name="shadows" id="shadows" min="-1" max="1" step="0.01" value="{{ settings.shadows }}">
-                                <button type="button" class="step-btn inc" data-target="shadows">+</button>
+                        <div class="control">
+                            <label for="shadows">Shadows <span id="val-shadows">{{ settings.shadows }}</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="shadows_slider" min="-1000" max="1000" step="1"
+                                    value="{{ settings.shadows }}">
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn dec" data-target="shadows">−</button>
+                                    <input type="number" name="shadows" id="shadows" min="-1" max="1" step="0.01"
+                                        value="{{ settings.shadows }}">
+                                    <button type="button" class="step-btn inc" data-target="shadows">+</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </section>
+                    </section>
 
-                <section class="control-group">
-                    <h3>Color <span>🎨</span></h3>
-                    <div class="control">
-                        <label for="temperature">Temperature <span id="val-temperature">{{ settings.temperature }}</span></label>
-                        <div class="slider-container">
-                            <input type="range" id="temperature_slider" min="-1" max="1" step="0.01" value="{{ settings.temperature }}">
-                            <div class="numeric-control">
-                                <button type="button" class="step-btn dec" data-target="temperature">−</button>
-                                <input type="number" name="temperature" id="temperature" min="-1" max="1" step="0.01" value="{{ settings.temperature }}">
-                                <button type="button" class="step-btn inc" data-target="temperature">+</button>
+                    <section class="control-group">
+                        <h3>Color <span>🎨</span></h3>
+                        <div class="control">
+                            <label for="temperature">Temperature <span id="val-temperature">{{ settings.temperature
+                                    }}</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="temperature_slider" min="-1000" max="1000" step="1"
+                                    value="{{ settings.temperature }}">
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn dec" data-target="temperature">−</button>
+                                    <input type="number" name="temperature" id="temperature" min="-1000" max="1000"
+                                        step="1" value="{{ settings.temperature }}">
+                                    <button type="button" class="step-btn inc" data-target="temperature">+</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="control">
-                        <label for="saturation">Saturation <span id="val-saturation">{{ settings.saturation }}</span></label>
-                        <div class="slider-container">
-                            <input type="range" id="saturation_slider" min="0" max="5" step="0.01" value="{{ settings.saturation }}">
-                            <div class="numeric-control">
-                                <button type="button" class="step-btn dec" data-target="saturation">−</button>
-                                <input type="number" name="saturation" id="saturation" min="0" max="5" step="0.01" value="{{ settings.saturation }}">
-                                <button type="button" class="step-btn inc" data-target="saturation">+</button>
+                        <div class="control">
+                            <label for="saturation">Saturation <span id="val-saturation">{{ settings.saturation
+                                    }}</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="saturation_slider" min="0" max="1000" step="1"
+                                    value="{{ settings.saturation }}">
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn dec" data-target="saturation">−</button>
+                                    <input type="number" name="saturation" id="saturation" min="0" max="1000" step="1"
+                                        value="{{ settings.saturation }}">
+                                    <button type="button" class="step-btn inc" data-target="saturation">+</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="control">
-                        <label for="vibrance">Vibrance <span id="val-vibrance">{{ settings.vibrance }}</span></label>
-                        <div class="slider-container">
-                            <input type="range" id="vibrance_slider" min="-1" max="1" step="0.01" value="{{ settings.vibrance }}">
-                            <div class="numeric-control">
-                                <button type="button" class="step-btn dec" data-target="vibrance">−</button>
-                                <input type="number" name="vibrance" id="vibrance" min="-1" max="1" step="0.01" value="{{ settings.vibrance }}">
-                                <button type="button" class="step-btn inc" data-target="vibrance">+</button>
+                        <div class="control">
+                            <label for="vibrance">Vibrance <span id="val-vibrance">{{ settings.vibrance
+                                    }}</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="vibrance_slider" min="-1000" max="1000" step="1"
+                                    value="{{ settings.vibrance }}">
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn dec" data-target="vibrance">−</button>
+                                    <input type="number" name="vibrance" id="vibrance" min="-1000" max="1000" step="1"
+                                        value="{{ settings.vibrance }}">
+                                    <button type="button" class="step-btn inc" data-target="vibrance">+</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="control-divider">RGB Balancing</div>
-                    <div class="btn-grid">
-                        <div class="control">
-                            <label for="red">Red</label>
-                            <input type="number" name="red" id="red" min="0" max="2" step="0.01" value="{{ settings.red }}" style="width: 100%; height: 32px; background: #1a1a1c; border: 1px solid var(--border-color); border-radius: 6px; color: white; text-align: center;">
-                        </div>
-                        <div class="control">
-                            <label for="green">Green</label>
-                            <input type="number" name="green" id="green" min="0" max="2" step="0.01" value="{{ settings.green }}" style="width: 100%; height: 32px; background: #1a1a1c; border: 1px solid var(--border-color); border-radius: 6px; color: white; text-align: center;">
-                        </div>
-                        <div class="control">
-                            <label for="blue">Blue</label>
-                            <input type="number" name="blue" id="blue" min="0" max="2" step="0.01" value="{{ settings.blue }}" style="width: 100%; height: 32px; background: #1a1a1c; border: 1px solid var(--border-color); border-radius: 6px; color: white; text-align: center;">
-                        </div>
-                    </div>
-                </section>
 
-                <section class="control-group">
-                    <button type="submit" class="primary-btn" style="width: 100%;">Apply High-Res Preview</button>
-                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; text-align: center;">Processes full image on server</p>
-                </section>
+                        <div class="control-divider">RGB Balancing</div>
+                        <div class="btn-grid">
+                            <div class="control">
+                                <label for="red">Red</label>
+                                <input type="number" name="red" id="red" min="0" max="1000" step="1"
+                                    value="{{ settings.red }}"
+                                    style="width: 100%; height: 32px; background: #1a1a1c; border: 1px solid var(--border-color); border-radius: 6px; color: white; text-align: center;">
+                            </div>
+                            <div class="control">
+                                <label for="green">Green</label>
+                                <input type="number" name="green" id="green" min="0" max="1000" step="1"
+                                    value="{{ settings.green }}"
+                                    style="width: 100%; height: 32px; background: #1a1a1c; border: 1px solid var(--border-color); border-radius: 6px; color: white; text-align: center;">
+                            </div>
+                            <div class="control">
+                                <label for="blue">Blue</label>
+                                <input type="number" name="blue" id="blue" min="0" max="1000" step="1"
+                                    value="{{ settings.blue }}"
+                                    style="width: 100%; height: 32px; background: #1a1a1c; border: 1px solid var(--border-color); border-radius: 6px; color: white; text-align: center;">
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="control-group">
+                        <button type="submit" class="primary-btn" style="width: 100%;">Apply High-Res Preview</button>
+                        <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; text-align: center;">
+                            Processes full image on server</p>
+                    </section>
                 </form>
 
                 <section class="control-group">
@@ -164,7 +199,8 @@
 
                 <section class="control-group">
                     <h3>Presets <span>✨</span></h3>
-                    <textarea id="presetJsonInput" placeholder='Paste JSON Presets...' class="custom-textarea"></textarea>
+                    <textarea id="presetJsonInput" placeholder='Paste JSON Presets...'
+                        class="custom-textarea"></textarea>
                     <div class="btn-grid">
                         <button type="button" id="loadExampleBtn" class="secondary-btn">Example</button>
                         <button type="button" id="applyPresetsBtn" class="primary-btn">Parse</button>
@@ -189,7 +225,8 @@
 
         <!-- Main Workspace -->
         <main class="workspace">
-            <div id="canvasContainer" class="canvas-container" {% if not preview_url %}style="display: none;"{% endif %}>
+            <div id="canvasContainer" class="canvas-container" {% if not preview_url %}style="display: none;" {% endif
+                %}>
                 {% if preview_url %}
                 <div id="pythonPreviewContainer" class="python-preview-container">
                     <img src="{{ preview_url }}" id="pythonPreviewImg" class="preview-img">
@@ -197,13 +234,13 @@
                 {% endif %}
                 <canvas id="mainCanvas"></canvas>
             </div>
-            
-            <div id="dropZone" class="drop-zone" {% if preview_url %}style="display: none;"{% endif %}>
+
+            <div id="dropZone" class="drop-zone" {% if preview_url %}style="display: none;" {% endif %}>
                 <div style="font-size: 3rem; margin-bottom: 1rem;">📥</div>
                 <p>Drag & Drop an image here</p>
                 <p style="font-size: 0.8rem; color: var(--text-muted);">or click Import Image in the sidebar</p>
             </div>
-            
+
             <div class="loading-overlay" id="loadingOverlay">
                 <div class="loader"></div>
                 <p style="margin-top: 20px; font-weight: 500;">Applying adjustments...</p>
@@ -227,4 +264,5 @@
 
     <script src="{{ url_for('static', filename='js/editor.js') }}"></script>
 </body>
+
 </html>
