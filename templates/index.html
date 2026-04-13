@@ -25,38 +25,59 @@
                     <h3>Light</h3>
                     <div class="control">
                         <label for="exposure">Exposure</label>
-                        <input type="range" id="exposure" min="-5" max="5" step="0.01" value="0">
-                        <span class="value">0.00</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="exposure" title="Decrease Exposure">−</button>
+                            <input type="number" id="exposure" min="-5" max="1000" step="0.01" value="0">
+                            <button class="step-btn inc" data-target="exposure" title="Increase Exposure">+</button>
+                        </div>
                     </div>
                     <div class="control">
                         <label for="brightness">Brightness</label>
-                        <input type="range" id="brightness" min="0" max="5" step="0.01" value="1">
-                        <span class="value">1.0</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="brightness" title="Decrease Brightness">−</button>
+                            <input type="number" id="brightness" min="0" max="1000" step="0.01" value="1">
+                            <button class="step-btn inc" data-target="brightness" title="Increase Brightness">+</button>
+                        </div>
                     </div>
                     <div class="control">
                         <label for="contrast">Contrast</label>
-                        <input type="range" id="contrast" min="0" max="5" step="0.01" value="1">
-                        <span class="value">1.0</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="contrast" title="Decrease Contrast">−</button>
+                            <input type="number" id="contrast" min="0" max="1000" step="0.01" value="1">
+                            <button class="step-btn inc" data-target="contrast" title="Increase Contrast">+</button>
+                        </div>
                     </div>
                     <div class="control">
                         <label for="highlights">Highlights</label>
-                        <input type="range" id="highlights" min="-5" max="5" step="0.01" value="0">
-                        <span class="value">0.00</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="highlights" title="Decrease Highlights">−</button>
+                            <input type="number" id="highlights" min="-5" max="1000" step="0.01" value="0">
+                            <button class="step-btn inc" data-target="highlights" title="Increase Highlights">+</button>
+                        </div>
                     </div>
                     <div class="control">
                         <label for="shadows">Shadows</label>
-                        <input type="range" id="shadows" min="-5" max="5" step="0.01" value="0">
-                        <span class="value">0.00</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="shadows" title="Decrease Shadows">−</button>
+                            <input type="number" id="shadows" min="-5" max="1000" step="0.01" value="0">
+                            <button class="step-btn inc" data-target="shadows" title="Increase Shadows">+</button>
+                        </div>
                     </div>
                     <div class="control">
                         <label for="whites">Whites</label>
-                        <input type="range" id="whites" min="-5" max="5" step="0.01" value="0">
-                        <span class="value">0.00</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="whites" title="Decrease Whites">−</button>
+                            <input type="number" id="whites" min="-5" max="1000" step="0.01" value="0">
+                            <button class="step-btn inc" data-target="whites" title="Increase Whites">+</button>
+                        </div>
                     </div>
                     <div class="control">
                         <label for="blacks">Blacks</label>
-                        <input type="range" id="blacks" min="-5" max="5" step="0.01" value="0">
-                        <span class="value">0.00</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="blacks" title="Decrease Blacks">−</button>
+                            <input type="number" id="blacks" min="-5" max="1000" step="0.01" value="0">
+                            <button class="step-btn inc" data-target="blacks" title="Increase Blacks">+</button>
+                        </div>
                     </div>
                 </section>
 
@@ -64,39 +85,60 @@
                     <h3>Color</h3>
                     <div class="control">
                         <label for="temperature">Temperature</label>
-                        <input type="range" id="temperature" min="-5" max="5" step="0.01" value="0">
-                        <span class="value">0.00</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="temperature" title="Decrease Temperature">−</button>
+                            <input type="number" id="temperature" min="-5" max="1000" step="0.01" value="0">
+                            <button class="step-btn inc" data-target="temperature" title="Increase Temperature">+</button>
+                        </div>
                     </div>
                     <div class="control">
                         <label for="tint">Tint</label>
-                        <input type="range" id="tint" min="-5" max="5" step="0.01" value="0">
-                        <span class="value">0.00</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="tint" title="Decrease Tint">−</button>
+                            <input type="number" id="tint" min="-5" max="1000" step="0.01" value="0">
+                            <button class="step-btn inc" data-target="tint" title="Increase Tint">+</button>
+                        </div>
                     </div>
                     <div class="control">
                         <label for="vibrance">Vibrance</label>
-                        <input type="range" id="vibrance" min="-5" max="5" step="0.01" value="0">
-                        <span class="value">0.00</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="vibrance" title="Decrease Vibrance">−</button>
+                            <input type="number" id="vibrance" min="-5" max="1000" step="0.01" value="0">
+                            <button class="step-btn inc" data-target="vibrance" title="Increase Vibrance">+</button>
+                        </div>
                     </div>
                     <div class="control">
                         <label for="saturation">Saturation</label>
-                        <input type="range" id="saturation" min="0" max="5" step="0.01" value="1">
-                        <span class="value">1.0</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="saturation" title="Decrease Saturation">−</button>
+                            <input type="number" id="saturation" min="0" max="1000" step="0.01" value="1">
+                            <button class="step-btn inc" data-target="saturation" title="Increase Saturation">+</button>
+                        </div>
                     </div>
                     <div class="control-divider">RGB Channels</div>
                     <div class="control">
                         <label for="red">Red</label>
-                        <input type="range" id="red" min="0" max="5" step="0.01" value="1">
-                        <span class="value">1.0</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="red" title="Decrease Red">−</button>
+                            <input type="number" id="red" min="0" max="5" step="0.01" value="1">
+                            <button class="step-btn inc" data-target="red" title="Increase Red">+</button>
+                        </div>
                     </div>
                     <div class="control">
                         <label for="green">Green</label>
-                        <input type="range" id="green" min="0" max="5" step="0.01" value="1">
-                        <span class="value">1.0</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="green" title="Decrease Green">−</button>
+                            <input type="number" id="green" min="0" max="5" step="0.01" value="1">
+                            <button class="step-btn inc" data-target="green" title="Increase Green">+</button>
+                        </div>
                     </div>
                     <div class="control">
                         <label for="blue">Blue</label>
-                        <input type="range" id="blue" min="0" max="5" step="0.01" value="1">
-                        <span class="value">1.0</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="blue" title="Decrease Blue">−</button>
+                            <input type="number" id="blue" min="0" max="5" step="0.01" value="1">
+                            <button class="step-btn inc" data-target="blue" title="Increase Blue">+</button>
+                        </div>
                     </div>
                 </section>
 
@@ -104,13 +146,19 @@
                     <h3>Presence</h3>
                     <div class="control">
                         <label for="clarity">Clarity</label>
-                        <input type="range" id="clarity" min="-5" max="5" step="0.01" value="0">
-                        <span class="value">0.00</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="clarity" title="Decrease Clarity">−</button>
+                            <input type="number" id="clarity" min="-5" max="5" step="0.01" value="0">
+                            <button class="step-btn inc" data-target="clarity" title="Increase Clarity">+</button>
+                        </div>
                     </div>
                     <div class="control">
                         <label for="dehaze">Dehaze</label>
-                        <input type="range" id="dehaze" min="-5" max="5" step="0.01" value="0">
-                        <span class="value">0.00</span>
+                        <div class="numeric-control">
+                            <button class="step-btn dec" data-target="dehaze" title="Decrease Dehaze">−</button>
+                            <input type="number" id="dehaze" min="-5" max="5" step="0.01" value="0">
+                            <button class="step-btn inc" data-target="dehaze" title="Increase Dehaze">+</button>
+                        </div>
                     </div>
                 </section>
 

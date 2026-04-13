@@ -88,11 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function applyState(state) {
         Object.keys(sliders).forEach(key => {
             sliders[key].value = state[key];
-            sliders[key].el.value = state[key];
-            const valueDisplay = sliders[key].el.nextElementSibling;
-            if (valueDisplay && valueDisplay.classList.contains('value')) {
-                valueDisplay.textContent = state[key].toFixed(2);
-            }
+            sliders[key].el.value = state[key].toFixed(2);
         });
 
         rotation = state.rotation;
@@ -175,16 +171,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Real-time Adjustment Listeners
     Object.keys(sliders).forEach(key => {
+        // Handle direct input/change on numeric input
         sliders[key].el.addEventListener('input', (e) => {
             const val = parseFloat(e.target.value);
-            sliders[key].value = val;
-            e.target.nextElementSibling.textContent = val.toFixed(2);
-            render();
+            if (!isNaN(val)) {
+                sliders[key].value = val;
+                render();
+            }
         });
         
         sliders[key].el.addEventListener('change', () => {
             saveState();
         });
+    });
+
+    // Handle increment/decrement buttons
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('step-btn')) {
+            const targetId = e.target.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            if (!input) return;
+
+            const step = parseFloat(input.getAttribute('step')) || 1;
+            const min = parseFloat(input.getAttribute('min'));
+            const max = parseFloat(input.getAttribute('max'));
+            let currentVal = parseFloat(input.value) || 0;
+
+            if (e.target.classList.contains('inc')) {
+                currentVal += step;
+            } else if (e.target.classList.contains('dec')) {
+                currentVal -= step;
+            }
+
+            // Clamp value
+            if (!isNaN(min)) currentVal = Math.max(min, currentVal);
+            if (!isNaN(max)) currentVal = Math.min(max, currentVal);
+
+            // Update input and trigger change
+            input.value = currentVal.toFixed(2);
+            
+            // Update internal state and render
+            sliders[targetId].value = currentVal;
+            render();
+            saveState();
+        }
     });
 
     // Transform Handlers
