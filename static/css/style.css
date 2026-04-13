@@ -251,6 +251,19 @@ canvas {
     display: block;
 }
 
+.preview-img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.python-preview-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .drop-zone {
     width: 600px;
     height: 400px;

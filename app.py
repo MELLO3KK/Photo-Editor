@@ -19,7 +19,33 @@ def allowed_file(filename):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # Get settings from query parameters for the Python-only preview
+    settings = {
+        'brightness': request.args.get('brightness', '1'),
+        'contrast': request.args.get('contrast', '1'),
+        'saturation': request.args.get('saturation', '1'),
+        'exposure': request.args.get('exposure', '0'),
+        'temperature': request.args.get('temperature', '0'),
+        'tint': request.args.get('tint', '0'),
+        'highlights': request.args.get('highlights', '0'),
+        'shadows': request.args.get('shadows', '0'),
+        'whites': request.args.get('whites', '0'),
+        'blacks': request.args.get('blacks', '0'),
+        'vibrance': request.args.get('vibrance', '0'),
+        'clarity': request.args.get('clarity', '0'),
+        'dehaze': request.args.get('dehaze', '0'),
+        'red': request.args.get('red', '1'),
+        'green': request.args.get('green', '1'),
+        'blue': request.args.get('blue', '1'),
+    }
+    
+    # Generate preview URL if there is an original file in session
+    preview_url = None
+    if session.get('original_file'):
+        import urllib.parse
+        preview_url = f"/preview?{urllib.parse.urlencode(settings)}"
+        
+    return render_template('index.html', settings=settings, preview_url=preview_url)
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
@@ -70,6 +96,43 @@ def process_image():
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route('/preview')
+def preview_image():
+    filename = session.get('original_file')
+    if not filename:
+        return "No image uploaded", 400
+        
+    # Extract settings from query parameters
+    settings = {
+        'brightness': float(request.args.get('brightness', 1.0)),
+        'contrast': float(request.args.get('contrast', 1.0)),
+        'saturation': float(request.args.get('saturation', 1.0)),
+        'exposure': float(request.args.get('exposure', 0.0)),
+        'temperature': float(request.args.get('temperature', 0.0)),
+        'tint': float(request.args.get('tint', 0.0)),
+        'highlights': float(request.args.get('highlights', 0.0)),
+        'shadows': float(request.args.get('shadows', 0.0)),
+        'whites': float(request.args.get('whites', 0.0)),
+        'blacks': float(request.args.get('blacks', 0.0)),
+        'vibrance': float(request.args.get('vibrance', 0.0)),
+        'clarity': float(request.args.get('clarity', 0.0)),
+        'dehaze': float(request.args.get('dehaze', 0.0)),
+        'red': float(request.args.get('red', 1.0)),
+        'green': float(request.args.get('green', 1.0)),
+        'blue': float(request.args.get('blue', 1.0)),
+    }
+    
+    original_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    processed_img = ImageProcessor.apply_adjustments(original_path, settings)
+    
+    # Return image directly
+    import io
+    from flask import send_file
+    img_io = io.BytesIO()
+    processed_img.save(img_io, 'JPEG', quality=80)
+    img_io.seek(0)
+    return send_file(img_io, mimetype='image/jpeg')
 
 @app.route('/export', methods=['POST'])
 def export_image():
