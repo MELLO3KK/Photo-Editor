@@ -155,5 +155,12 @@ def export_image():
         'url': f'/uploads/{export_filename}'
     })
 
+@app.route('/clear', methods=['POST'])
+def clear_session():
+    session.pop('original_file', None)
+    session.pop('history', None)
+    session.pop('history_index', None)
+    return jsonify({'success': True})
+
 if __name__ == '__main__':
     app.run(debug=True)
