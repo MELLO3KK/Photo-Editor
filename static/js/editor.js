@@ -110,20 +110,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Drop zone handlers
-    dropZone.addEventListener('dragover', (e) => {
+    const dropOverlay = document.getElementById('dropOverlay');
+    let dragCounter = 0;
+
+    window.addEventListener('dragenter', (e) => {
         e.preventDefault();
-        dropZone.style.borderColor = 'var(--accent)';
+        dragCounter++;
+        if (dragCounter === 1) {
+            dropOverlay.classList.add('active');
+        }
     });
 
-    dropZone.addEventListener('dragleave', (e) => {
+    window.addEventListener('dragover', (e) => {
         e.preventDefault();
-        dropZone.style.borderColor = '#444';
     });
 
-    dropZone.addEventListener('drop', (e) => {
+    window.addEventListener('dragleave', (e) => {
         e.preventDefault();
-        dropZone.style.borderColor = '#444';
+        dragCounter--;
+        if (dragCounter === 0) {
+            dropOverlay.classList.remove('active');
+        }
+    });
+
+    window.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dragCounter = 0;
+        dropOverlay.classList.remove('active');
+        
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             handleUpload(e.dataTransfer.files[0]);
         }
