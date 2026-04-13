@@ -156,6 +156,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             if (data.success) {
                 currentImageFilename = data.filename;
+                
+                // Switch back to canvas mode from Python preview mode
+                const pyPreview = document.getElementById('pythonPreviewContainer');
+                if (pyPreview) pyPreview.style.display = 'none';
+                mainCanvas.style.display = 'block';
+
                 loadImage(data.url);
                 exportBtn.disabled = false;
                 history = [];
@@ -414,21 +420,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
         
-        // Update SVG filter matrix
+        // Update SVG filter matrix with RGB gains and White Balance
         const colorMatrix = document.getElementById('colorMatrix');
         if (colorMatrix) {
+            let r = sliders.red.value;
+            let g = sliders.green.value;
+            let b = sliders.blue.value;
+
+            // Temperature approximation (Blue-Yellow)
+            const temp = sliders.temperature.value;
+            if (temp > 0) {
+                r += temp * 0.2;
+                b -= temp * 0.2;
+            } else {
+                r += temp * 0.2;
+                b -= temp * 0.2;
+            }
+
+            // Tint approximation (Green-Magenta)
+            const tint = sliders.tint.value;
+            g -= tint * 0.1;
+
             colorMatrix.setAttribute('values', `
-                ${sliders.red.value} 0 0 0 0
-                0 ${sliders.green.value} 0 0 0
-                0 0 ${sliders.blue.value} 0 0
+                ${r} 0 0 0 0
+                0 ${g} 0 0 0
+                0 0 ${b} 0 0
                 0 0 0 1 0
             `);
         }
 
         // Update CSS filters for real-time preview (approximation)
-        // Exposure can be approximated by brightness boost/cut
         const exposureBrightness = Math.pow(2, sliders.exposure.value);
-        ctx.filter = `url(#colorBalance) brightness(${sliders.brightness.value * exposureBrightness}) contrast(${sliders.contrast.value}) saturate(${sliders.saturation.value})`;
+        // Approximate vibrance by adding to saturation
+        const totalSaturation = sliders.saturation.value + (sliders.vibrance.value * 0.3);
+        
+        ctx.filter = `url(#colorBalance) brightness(${sliders.brightness.value * exposureBrightness}) contrast(${sliders.contrast.value}) saturate(${totalSaturation})`;
         
         ctx.save();
         ctx.translate(mainCanvas.width / 2, mainCanvas.height / 2);
@@ -566,6 +592,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 "blacks": 0.3,
                 "saturation": 0.7
             }
+        },
+        {
+            "name": "Comprehensive Example",
+            "settings": {
+                "exposure": 0.5,
+                "brightness": 1.1,
+                "contrast": 1.2,
+                "highlights": -0.2,
+                "shadows": 0.3,
+                "whites": 0.1,
+                "blacks": -0.1,
+                "temperature": 0.4,
+                "tint": 0.1,
+                "vibrance": 0.6,
+                "saturation": 1.1,
+                "clarity": 0.2,
+                "dehaze": 0.1,
+                "red": 1.05,
+                "green": 1.0,
+                "blue": 0.95,
+                "rotation": 90,
+                "crop": {
+                    "x": 100,
+                    "y": 100,
+                    "width": 800,
+                    "height": 600
+                }
+            }
         }
     ];
 
@@ -612,6 +666,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applyPreset(settings) {
+        if (!originalImage || historyIndex < 0) {
+            alert('Please import an image first.');
+            return;
+        }
+
         // Reset to default first (optional, but usually cleaner)
         const defaults = {
             exposure: 0, brightness: 1, contrast: 1, highlights: 0, shadows: 0,
@@ -619,14 +678,24 @@ document.addEventListener('DOMContentLoaded', () => {
             saturation: 1, clarity: 0, dehaze: 0, red: 1, green: 1, blue: 1
         };
 
+        const currentState = JSON.parse(history[historyIndex]);
         const newState = {
-            ...JSON.parse(history[historyIndex]), // Start with current actual state (rotation/crop)
-            ...defaults, // Reset color settings
-            ...settings  // Apply preset settings
+            ...currentState, // Start with current actual state (rotation/crop)
+            ...defaults,      // Reset color settings
+            ...settings       // Apply preset settings
         };
 
         applyState(newState);
         saveState();
+        
+        // Visual feedback
+        const card = Array.from(document.querySelectorAll('.preset-card h4'))
+            .find(h => h.textContent === settings.name);
+        if (card) {
+            const parent = card.parentElement;
+            parent.style.transform = 'scale(0.95)';
+            setTimeout(() => parent.style.transform = '', 100);
+        }
     }
 
     function showLoading(show) {
