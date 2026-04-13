@@ -27,6 +27,18 @@
             </div>
 
             <div class="controls-scroll">
+                <section class="control-group">
+                    <h3>JSON Presets <span>⚡</span></h3>
+                    <p style="font-size: 0.7rem; color: var(--text-muted); margin-bottom: 8px;">Paste JSON here for instant previewing</p>
+                    <textarea id="presetJsonInput" placeholder='{"exposure": 50, "contrast": 220...}'
+                        class="custom-textarea" style="height: 120px; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;"></textarea>
+                    <div class="btn-grid">
+                        <button type="button" id="loadExampleBtn" class="secondary-btn">Example</button>
+                        <button type="button" id="applyPresetsBtn" class="primary-btn">Parse & Save</button>
+                    </div>
+                    <div id="presetsContainer" class="presets-grid"></div>
+                </section>
+
                 <form id="pythonPreviewForm" method="GET" action="/">
                     <section class="control-group">
                         <h3>Light <span>✨</span></h3>
@@ -93,9 +105,35 @@
                                     value="{{ settings.shadows }}">
                                 <div class="numeric-control">
                                     <button type="button" class="step-btn dec" data-target="shadows">−</button>
-                                    <input type="number" name="shadows" id="shadows" min="-1" max="1" step="0.01"
+                                    <input type="number" name="shadows" id="shadows" min="-1000" max="1000" step="1"
                                         value="{{ settings.shadows }}">
                                     <button type="button" class="step-btn inc" data-target="shadows">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <label for="whites">Whites <span id="val-whites">{{ settings.whites }}</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="whites_slider" min="-1000" max="1000" step="1"
+                                    value="{{ settings.whites }}">
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn dec" data-target="whites">−</button>
+                                    <input type="number" name="whites" id="whites" min="-1000" max="1000" step="1"
+                                        value="{{ settings.whites }}">
+                                    <button type="button" class="step-btn inc" data-target="whites">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <label for="blacks">Blacks <span id="val-blacks">{{ settings.blacks }}</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="blacks_slider" min="-1000" max="1000" step="1"
+                                    value="{{ settings.blacks }}">
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn dec" data-target="blacks">−</button>
+                                    <input type="number" name="blacks" id="blacks" min="-1000" max="1000" step="1"
+                                        value="{{ settings.blacks }}">
+                                    <button type="button" class="step-btn inc" data-target="blacks">+</button>
                                 </div>
                             </div>
                         </div>
@@ -114,6 +152,19 @@
                                     <input type="number" name="temperature" id="temperature" min="-1000" max="1000"
                                         step="1" value="{{ settings.temperature }}">
                                     <button type="button" class="step-btn inc" data-target="temperature">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <label for="tint">Tint <span id="val-tint">{{ settings.tint }}</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="tint_slider" min="-1000" max="1000" step="1"
+                                    value="{{ settings.tint }}">
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn dec" data-target="tint">−</button>
+                                    <input type="number" name="tint" id="tint" min="-1000" max="1000" step="1"
+                                        value="{{ settings.tint }}">
+                                    <button type="button" class="step-btn inc" data-target="tint">+</button>
                                 </div>
                             </div>
                         </div>
@@ -146,6 +197,34 @@
                             </div>
                         </div>
 
+                        <div class="control-divider">Effects</div>
+                        <div class="control">
+                            <label for="clarity">Clarity <span id="val-clarity">{{ settings.clarity }}</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="clarity_slider" min="-1000" max="1000" step="1"
+                                    value="{{ settings.clarity }}">
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn dec" data-target="clarity">−</button>
+                                    <input type="number" name="clarity" id="clarity" min="-1000" max="1000" step="1"
+                                        value="{{ settings.clarity }}">
+                                    <button type="button" class="step-btn inc" data-target="clarity">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <label for="dehaze">Dehaze <span id="val-dehaze">{{ settings.dehaze }}</span></label>
+                            <div class="slider-container">
+                                <input type="range" id="dehaze_slider" min="-1000" max="1000" step="1"
+                                    value="{{ settings.dehaze }}">
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn dec" data-target="dehaze">−</button>
+                                    <input type="number" name="dehaze" id="dehaze" min="-1000" max="1000" step="1"
+                                        value="{{ settings.dehaze }}">
+                                    <button type="button" class="step-btn inc" data-target="dehaze">+</button>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="control-divider">RGB Balancing</div>
                         <div class="btn-grid">
                             <div class="control">
@@ -171,8 +250,6 @@
 
                     <section class="control-group">
                         <button type="submit" class="primary-btn" style="width: 100%;">Apply High-Res Preview</button>
-                        <p style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; text-align: center;">
-                            Processes full image on server</p>
                     </section>
                 </form>
 
@@ -198,23 +275,13 @@
                 </section>
 
                 <section class="control-group">
-                    <h3>Presets <span>✨</span></h3>
-                    <textarea id="presetJsonInput" placeholder='Paste JSON Presets...'
-                        class="custom-textarea"></textarea>
-                    <div class="btn-grid">
-                        <button type="button" id="loadExampleBtn" class="secondary-btn">Example</button>
-                        <button type="button" id="applyPresetsBtn" class="primary-btn">Parse</button>
-                    </div>
-                    <div id="presetsContainer" class="presets-grid"></div>
-                </section>
-
-                <section class="control-group">
                     <h3>History <span>🕒</span></h3>
                     <div class="btn-grid">
                         <button type="button" id="undoBtn" class="secondary-btn" disabled>Undo</button>
                         <button type="button" id="redoBtn" class="secondary-btn" disabled>Redo</button>
                     </div>
                 </section>
+
             </div>
 
             <div class="export-section">

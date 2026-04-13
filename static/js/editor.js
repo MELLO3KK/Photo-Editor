@@ -15,12 +15,24 @@ document.addEventListener('DOMContentLoaded', () => {
         contrast: { el: document.getElementById('contrast'), slider: document.getElementById('contrast_slider'), value: 200 },
         highlights: { el: document.getElementById('highlights'), slider: document.getElementById('highlights_slider'), value: 0 },
         shadows: { el: document.getElementById('shadows'), slider: document.getElementById('shadows_slider'), value: 0 },
+        whites: { el: document.getElementById('whites'), slider: document.getElementById('whites_slider'), value: 0 },
+        blacks: { el: document.getElementById('blacks'), slider: document.getElementById('blacks_slider'), value: 0 },
         temperature: { el: document.getElementById('temperature'), slider: document.getElementById('temperature_slider'), value: 0 },
+        tint: { el: document.getElementById('tint'), slider: document.getElementById('tint_slider'), value: 0 },
         vibrance: { el: document.getElementById('vibrance'), slider: document.getElementById('vibrance_slider'), value: 0 },
         saturation: { el: document.getElementById('saturation'), slider: document.getElementById('saturation_slider'), value: 200 },
+        clarity: { el: document.getElementById('clarity'), slider: document.getElementById('clarity_slider'), value: 0 },
+        dehaze: { el: document.getElementById('dehaze'), slider: document.getElementById('dehaze_slider'), value: 0 },
         red: { el: document.getElementById('red'), value: 500 },
         green: { el: document.getElementById('green'), value: 500 },
         blue: { el: document.getElementById('blue'), value: 500 }
+    };
+
+    const DEFAULTS = {
+        exposure: 0, brightness: 200, contrast: 200, highlights: 0, shadows: 0,
+        whites: 0, blacks: 0, temperature: 0, tint: 0, vibrance: 0,
+        saturation: 200, clarity: 0, dehaze: 0, red: 500, green: 500, blue: 500,
+        rotation: 0, crop: null
     };
 
     let originalImage = null;
@@ -56,25 +68,16 @@ document.addEventListener('DOMContentLoaded', () => {
             group.style.transition = 'all 0.5s ease';
             group.style.opacity = '1';
             group.style.transform = 'translateX(0)';
-        }, 100 + i * 50);
+        }, 50 + i * 30);
     });
 
     function saveState() {
-        const state = {
-            exposure: sliders.exposure.value,
-            brightness: sliders.brightness.value,
-            contrast: sliders.contrast.value,
-            highlights: sliders.highlights.value,
-            shadows: sliders.shadows.value,
-            temperature: sliders.temperature.value,
-            vibrance: sliders.vibrance.value,
-            saturation: sliders.saturation.value,
-            red: sliders.red.value,
-            green: sliders.green.value,
-            blue: sliders.blue.value,
-            rotation: rotation,
-            crop: currentCrop
-        };
+        const state = {};
+        Object.keys(DEFAULTS).forEach(key => {
+            if (key === 'rotation') state[key] = rotation;
+            else if (key === 'crop') state[key] = currentCrop;
+            else state[key] = sliders[key].value;
+        });
         
         if (historyIndex < history.length - 1) {
             history = history.slice(0, historyIndex + 1);
@@ -464,8 +467,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (colorMatrix) {
             let r = sliders.red.value / 500.0, g = sliders.green.value / 500.0, b = sliders.blue.value / 500.0;
             const temp = sliders.temperature.value / 1000.0;
-            if (temp > 0) { r += temp * 0.2; b -= temp * 0.2; }
-            else { r += temp * 0.2; b -= temp * 0.2; }
+            const tint = sliders.tint.value / 1000.0;
+            
+            // Temperature: Blue-Yellow
+            if (temp > 0) { r += temp * 0.1; b -= temp * 0.1; }
+            else { r += temp * 0.1; b -= temp * 0.1; }
+            
+            // Tint: Green-Magenta
+            g -= tint * 0.05;
+            
             colorMatrix.setAttribute('values', `${r} 0 0 0 0 0 ${g} 0 0 0 0 0 ${b} 0 0 0 0 0 1 0`);
         }
 
@@ -562,24 +572,47 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     if (loadExampleBtn) loadExampleBtn.addEventListener('click', () => {
-        presetJsonInput.value = JSON.stringify(examplePresets, null, 4);
+        presetJsonInput.value = JSON.stringify(examplePresets[0].settings, null, 4);
+        presetJsonInput.dispatchEvent(new Event('input'));
+    });
+
+    let previewTimeout = null;
+    if (presetJsonInput) presetJsonInput.addEventListener('input', () => {
+        clearTimeout(previewTimeout);
+        previewTimeout = setTimeout(() => {
+            try {
+                const settings = JSON.parse(presetJsonInput.value);
+                // If it's an array of presets, just take the first one for live preview
+                const targetSettings = Array.isArray(settings) ? (settings[0].settings || settings[0]) : settings;
+                applyState({ ...DEFAULTS, ...targetSettings });
+            } catch (e) {
+                // Silently wait for valid JSON during typing
+            }
+        }, 300);
     });
 
     if (applyPresetsBtn) applyPresetsBtn.addEventListener('click', () => {
         try {
-            const presets = JSON.parse(presetJsonInput.value);
+            const data = JSON.parse(presetJsonInput.value);
+            const presets = Array.isArray(data) ? data : [{ name: "Pasted Preset", settings: data }];
+            
             presetsContainer.innerHTML = '';
             presets.forEach(preset => {
                 const card = document.createElement('div');
                 card.className = 'preset-card';
-                card.innerHTML = `<div class="preset-icon">✨</div><h4>${preset.name}</h4>`;
+                card.innerHTML = `<div class="preset-icon">✨</div><h4>${preset.name || 'Unnamed'}</h4>`;
                 card.addEventListener('click', () => {
-                    const defaults = { exposure: 0, brightness: 200, contrast: 200, highlights: 0, shadows: 0, temperature: 0, vibrance: 0, saturation: 200, red: 500, green: 500, blue: 500, rotation: 0, crop: null };
-                    applyState({ ...defaults, ...preset.settings });
+                    applyState({ ...DEFAULTS, ...(preset.settings || preset) });
                     saveState();
                 });
                 presetsContainer.appendChild(card);
             });
+            
+            // If it was just one preset (object), apply it immediately too
+            if (!Array.isArray(data)) {
+                applyState({ ...DEFAULTS, ...data });
+                saveState();
+            }
         } catch (e) { alert("Invalid JSON"); }
     });
 
