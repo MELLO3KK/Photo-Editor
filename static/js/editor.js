@@ -93,6 +93,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         rotation = state.rotation;
         currentCrop = state.crop;
+        
+        // Update UI states
+        if (typeof resetCropBtn !== 'undefined') {
+            resetCropBtn.disabled = !currentCrop;
+        }
+
         render();
     }
 
@@ -671,17 +677,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Reset to default first (optional, but usually cleaner)
+        // Complete reset to default values
         const defaults = {
             exposure: 0, brightness: 1, contrast: 1, highlights: 0, shadows: 0,
             whites: 0, blacks: 0, temperature: 0, tint: 0, vibrance: 0,
-            saturation: 1, clarity: 0, dehaze: 0, red: 1, green: 1, blue: 1
+            saturation: 1, clarity: 0, dehaze: 0, red: 1, green: 1, blue: 1,
+            rotation: 0,
+            crop: null
         };
 
-        const currentState = JSON.parse(history[historyIndex]);
         const newState = {
-            ...currentState, // Start with current actual state (rotation/crop)
-            ...defaults,      // Reset color settings
+            ...defaults,      // Reset everything to default first
             ...settings       // Apply preset settings
         };
 
