@@ -7,11 +7,9 @@ from processor import ImageProcessor
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-UPLOAD_FOLDER = 'uploads'
+# In-memory storage for images (filename: bytes)
+image_store = {}
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -56,8 +54,9 @@ def upload_file():
         return jsonify({'error': 'No selected file'}), 400
     if file and allowed_file(file.filename):
         filename = secure_filename(f"{uuid.uuid4()}_{file.filename}")
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
+        
+        # Store image in memory
+        image_store[filename] = file.read()
         
         # Initialize session state for this image
         session['original_file'] = filename
@@ -74,18 +73,33 @@ def upload_file():
 @app.route('/process', methods=['POST'])
 def process_image():
     data = request.json
-    filename = data.get('filename')
     settings = data.get('settings', {})
     
-    original_path = os.path.join(app.config['UPLOAD_FOLDER'], session.get('original_file'))
+    original_filename = session.get('original_file')
+    if not original_filename or original_filename not in image_store:
+        return jsonify({'error': 'No image found'}), 404
+        
+    import io
+    from PIL import Image
+    original_img = Image.open(io.BytesIO(image_store[original_filename]))
     
     # Process the image
-    processed_img = ImageProcessor.apply_adjustments(original_path, settings)
+    processed_img = ImageProcessor.apply_adjustments(original_img, settings)
     
-    # Save processed image to a temp file
+    # Store processed image in memory temporarily if needed, 
+    # but the current app architecture expects a URL to display.
+    # We'll generate a temporary UUID for the processed image in memory.
     processed_filename = f"proc_{uuid.uuid4()}.jpg"
-    processed_path = os.path.join(app.config['UPLOAD_FOLDER'], processed_filename)
-    processed_img.save(processed_path, quality=95)
+    
+    img_io = io.BytesIO()
+    processed_img.save(img_io, 'JPEG', quality=95)
+    image_store[processed_filename] = img_io.getvalue()
+    
+    # Track this filename in session to allow access
+    if 'history' not in session:
+        session['history'] = []
+    session['history'].append(processed_filename)
+    session.modified = True
     
     return jsonify({
         'success': True,
@@ -95,15 +109,26 @@ def process_image():
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    # Security: Ensure the image belongs to the current session
+    allowed_images = session.get('history', [])
+    if session.get('original_file'):
+        allowed_images.append(session.get('original_file'))
+        
+    if filename not in image_store or filename not in allowed_images:
+        return "Not found or unauthorized", 404
+    
+    import io
+    from flask import send_file
+    return send_file(io.BytesIO(image_store[filename]), mimetype='image/jpeg')
 
 @app.route('/preview')
 def preview_image():
     filename = session.get('original_file')
-    if not filename:
+    if not filename or filename not in image_store:
         return "No image uploaded", 400
         
     # Extract settings from query parameters
+    # ... (rest of settings extraction)
     settings = {
         'brightness': float(request.args.get('brightness', 200.0)),
         'contrast': float(request.args.get('contrast', 200.0)),
@@ -123,11 +148,12 @@ def preview_image():
         'blue': float(request.args.get('blue', 500.0)),
     }
     
-    original_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    processed_img = ImageProcessor.apply_adjustments(original_path, settings)
+    import io
+    from PIL import Image
+    original_img = Image.open(io.BytesIO(image_store[filename]))
+    processed_img = ImageProcessor.apply_adjustments(original_img, settings)
     
     # Return image directly
-    import io
     from flask import send_file
     img_io = io.BytesIO()
     processed_img.save(img_io, 'JPEG', quality=80)
@@ -140,23 +166,39 @@ def export_image():
     settings = data.get('settings', {})
     filename = session.get('original_file')
     
-    if not filename:
+    if not filename or filename not in image_store:
         return jsonify({'error': 'No image to export'}), 400
         
-    original_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    processed_img = ImageProcessor.apply_adjustments(original_path, settings)
+    import io
+    from PIL import Image
+    from flask import send_file
     
-    export_filename = f"export_{filename}"
-    export_path = os.path.join(app.config['UPLOAD_FOLDER'], export_filename)
-    processed_img.save(export_path, quality=100)
+    original_img = Image.open(io.BytesIO(image_store[filename]))
+    processed_img = ImageProcessor.apply_adjustments(original_img, settings)
     
-    return jsonify({
-        'success': True,
-        'url': f'/uploads/{export_filename}'
-    })
+    img_io = io.BytesIO()
+    processed_img.save(img_io, 'JPEG', quality=100)
+    img_io.seek(0)
+    
+    return send_file(
+        img_io,
+        mimetype='image/jpeg',
+        as_attachment=True,
+        download_name='edited_image.jpg'
+    )
 
 @app.route('/clear', methods=['POST'])
 def clear_session():
+    # Remove from memory store
+    original = session.get('original_file')
+    if original and original in image_store:
+        del image_store[original]
+        
+    # Remove any history items from store
+    for item in session.get('history', []):
+        if item in image_store:
+            del image_store[item]
+
     session.pop('original_file', None)
     session.pop('history', None)
     session.pop('history_index', None)

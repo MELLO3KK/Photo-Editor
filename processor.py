@@ -5,11 +5,16 @@ import os
 
 class ImageProcessor:
     @staticmethod
-    def apply_adjustments(image_path, settings):
+    def apply_adjustments(image_input, settings):
         """
         Apply professional adjustments using NumPy and PIL.
+        image_input can be a file path or a PIL Image object.
         """
-        img = Image.open(image_path)
+        if isinstance(image_input, Image.Image):
+            img = image_input
+        else:
+            img = Image.open(image_input)
+            
         if img.mode != 'RGB':
             img = img.convert('RGB')
         
