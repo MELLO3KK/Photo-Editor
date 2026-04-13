@@ -312,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const img = new Image();
         img.onload = () => {
             originalImage = img;
-            dropZone.style.display = 'none';
+            canvasContainer.classList.add('has-image');
             mainCanvas.style.display = 'block';
             renderPreview();
         };
@@ -396,12 +396,26 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.files[0]) handleUpload(e.target.files[0]);
     });
 
-    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('hover'); });
-    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('hover'));
-    dropZone.addEventListener('drop', (e) => {
+    // Drag and Drop implementation on canvasContainer for better UX
+    canvasContainer.addEventListener('dragover', (e) => {
         e.preventDefault();
-        dropZone.classList.remove('hover');
-        if (e.dataTransfer.files[0]) handleUpload(e.dataTransfer.files[0]);
+        canvasContainer.classList.add('drag-hover');
+    });
+
+    canvasContainer.addEventListener('dragleave', (e) => {
+        // Only remove if we're actually leaving the container, not entering a child
+        if (e.relatedTarget === null || !canvasContainer.contains(e.relatedTarget)) {
+            canvasContainer.classList.remove('drag-hover');
+        }
+    });
+
+    canvasContainer.addEventListener('drop', (e) => {
+        e.preventDefault();
+        canvasContainer.classList.remove('drag-hover');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            handleUpload(file);
+        }
     });
 
     document.getElementById('rotateRight').addEventListener('click', () => {

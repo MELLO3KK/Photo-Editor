@@ -207,17 +207,7 @@ body {
 }
 .numeric-control input[type=number] {
     -moz-appearance: textfield;
-}
-
-/* Hide spin buttons */
-.numeric-control input::-webkit-outer-spin-button,
-.numeric-control input::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    appearance: none;
-    margin: 0;
-}
-.numeric-control input[type=number] {
-    -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 .btn-grid {
@@ -530,4 +520,59 @@ button {
     align-items: center;
     justify-content: center;
     min-height: 0;
+    position: relative; /* Added for absolute positioning of drop zone as overlay */
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    transition: var(--transition-base);
+}
+
+.canvas-container.drag-hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+}
+
+.drop-zone {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+    z-index: 5;
+}
+
+.drop-icon {
+    font-size: 3rem;
+    filter: drop-shadow(0 0 10px var(--accent-soft));
+    transition: var(--transition-base);
+}
+
+.drop-zone p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.drop-zone:hover .drop-icon {
+    transform: scale(1.1);
+}
+
+/* Hide drop zone content when an image is loaded, but keep it as a drop target */
+.canvas-container.has-image .drop-zone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    pointer-events: none; /* Initially none, will be changed during dragover */
+}
+
+.canvas-container.has-image.drag-hover .drop-zone {
+    opacity: 1;
+    background: rgba(10, 10, 11, 0.8);
+    pointer-events: all;
+    backdrop-filter: blur(8px);
 }
