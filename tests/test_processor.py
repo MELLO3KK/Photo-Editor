@@ -27,12 +27,12 @@ def test_advanced_adjustments():
     
     try:
         # Test Exposure
-        settings = {'exposure': 1.0}
+        settings = {'exposure': 100.0} # +0.5 stops
         processed = ImageProcessor.apply_adjustments(img_path, settings)
         assert processed.getpixel((0,0))[0] > 128
 
         # Test Temperature
-        settings = {'temperature': 0.5}
+        settings = {'temperature': 500.0}
         processed = ImageProcessor.apply_adjustments(img_path, settings)
         r, g, b = processed.getpixel((0,0))
         assert r > b # Warmer shifts red up, blue down

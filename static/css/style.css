@@ -145,9 +145,7 @@ body {
 }
 
 .control label span {
-    color: var(--accent);
-    font-weight: 500;
-    font-size: 0.8rem;
+    display: none;
 }
 
 /* Integrated Slider & Numeric Control */
@@ -157,31 +155,6 @@ body {
     gap: 4px;
 }
 
-input[type="range"] {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: 4px;
-    background: var(--bg-modifier);
-    border-radius: 2px;
-    outline: none;
-    transition: background 0.2s ease;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 14px;
-    height: 14px;
-    background: var(--accent);
-    border-radius: 50%;
-    cursor: pointer;
-    transition: transform 0.1s;
-    box-shadow: 0 0 10px rgba(0, 120, 212, 0.4);
-}
-
-input[type="range"]::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
-}
 
 .numeric-control {
     display: flex;
@@ -219,10 +192,32 @@ input[type="range"]::-webkit-slider-thumb:hover {
     border: none;
     color: var(--text-primary);
     text-align: center;
-    font-family: inherit;
-    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
     outline: none;
-    width: 50px;
+    width: 60px;
+}
+
+/* Hide spin buttons */
+.numeric-control input::-webkit-outer-spin-button,
+.numeric-control input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+.numeric-control input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Hide spin buttons */
+.numeric-control input::-webkit-outer-spin-button,
+.numeric-control input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+.numeric-control input[type=number] {
+    -moz-appearance: textfield;
 }
 
 .btn-grid {
@@ -407,38 +402,7 @@ button {
 
 /* Value Badges */
 .val-badge {
-    background: var(--bg-dark);
-    color: var(--accent);
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
-    min-width: 32px;
-    text-align: center;
-}
-
-/* RGB Grid */
-.rgb-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-}
-
-.numeric-input {
-    width: 100%;
-    background: #0a0a0b;
-    border: 1px solid var(--border-color);
-    color: white;
-    padding: 6px;
-    border-radius: 6px;
-    text-align: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem;
-    outline: none;
-}
-
-.numeric-input:focus {
-    border-color: var(--accent);
+    display: none;
 }
 
 /* Presets Library */
@@ -466,16 +430,6 @@ button {
     background: var(--accent-soft);
 }
 
-.preset-tile .icon {
-    font-size: 1.5rem;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #1a1a1c;
-    border-radius: 10px;
-}
 
 .preset-tile .info h4 {
     font-size: 0.9rem;
@@ -485,6 +439,54 @@ button {
 .preset-tile .info p {
     font-size: 0.75rem;
     color: var(--text-muted);
+}
+
+/* Import Section Styles */
+.import-section {
+    margin-top: 24px;
+    padding-bottom: 30px;
+}
+
+.import-hint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+.import-textarea {
+    width: 100%;
+    height: 180px;
+    background: #0a0a0b;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    padding: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+    margin-bottom: 12px;
+    transition: var(--transition-base);
+}
+
+.import-textarea:focus {
+    border-color: var(--accent);
+    color: var(--text-primary);
+}
+
+.full-width {
+    width: 100%;
+}
+
+.status-msg {
+    margin-top: 8px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+.status-msg.success {
+    color: #10b981;
 }
 
 /* Sidebar Footer */

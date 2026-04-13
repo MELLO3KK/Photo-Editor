@@ -43,8 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const param = input.getAttribute('data-param');
             if (state[param] !== undefined) {
                 input.value = state[param];
-                const badge = document.getElementById(`val-${param}`);
-                if (badge) badge.textContent = state[param];
             }
         });
         isUpdatingFromUI = false;
@@ -63,12 +61,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isNaN(val)) return;
 
         currentState[param] = val;
-        
-        const badge = document.getElementById(`val-${param}`);
-        if (badge) badge.textContent = val;
 
         syncStateToEditor();
         renderPreview();
+    });
+
+    // --- Step Buttons (+/-) ---
+    document.querySelectorAll('.step-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const param = btn.getAttribute('data-param');
+            const input = document.querySelector(`input[data-param="${param}"]`);
+            if (!input) return;
+
+            const step = parseFloat(input.getAttribute('step')) || 1;
+            const currentVal = parseFloat(input.value) || 0;
+            const isMinus = btn.classList.contains('minus');
+            
+            let newVal = isMinus ? currentVal - step : currentVal + step;
+            
+            const min = parseFloat(input.getAttribute('min'));
+            const max = parseFloat(input.getAttribute('max'));
+            if (!isNaN(min)) newVal = Math.max(min, newVal);
+            if (!isNaN(max)) newVal = Math.min(max, newVal);
+
+            input.value = newVal;
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+        });
     });
 
     function syncStateToEditor() {
@@ -156,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Preset Library ---
-    const presets = [
+    let presets = [
         {
             name: "Classic Cinema",
             icon: "🎬",
@@ -183,21 +201,104 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     ];
 
-    const presetsLibrary = document.getElementById('presetsLibrary');
-    presets.forEach(p => {
-        const tile = document.createElement('div');
-        tile.className = 'preset-tile';
-        tile.innerHTML = `
-            <div class="icon">${p.icon}</div>
-            <div class="info">
-                <h4>${p.name}</h4>
-                <p>${p.desc}</p>
-            </div>
-        `;
-        tile.addEventListener('click', () => {
-            hardReset({ ...DEFAULTS, ...p.settings });
+    function renderPresets() {
+        const presetsLibrary = document.getElementById('presetsLibrary');
+        presetsLibrary.innerHTML = '';
+        presets.forEach(p => {
+            const tile = document.createElement('div');
+            tile.className = 'preset-tile';
+            tile.innerHTML = `
+                <div class="info">
+                    <h4>${p.name}</h4>
+                    <p>${p.desc}</p>
+                </div>
+            `;
+            tile.addEventListener('click', () => {
+                hardReset({ ...DEFAULTS, ...p.settings });
+            });
+            presetsLibrary.appendChild(tile);
         });
-        presetsLibrary.appendChild(tile);
+    }
+
+    renderPresets();
+
+    // --- Bulk Import Logic ---
+    const importArea = document.getElementById('presetImportArea');
+    const applyImportBtn = document.getElementById('applyImportBtn');
+    const importStatus = document.getElementById('importStatus');
+
+    const placeholderPresets = [
+        {
+            name: "Neon Nights",
+            icon: "🌆",
+            desc: "Vibrant city vibes with deep blues and neons",
+            settings: {
+                brightness: 210, contrast: 250, exposure: 50,
+                highlights: -100, shadows: 50, saturation: 280,
+                vibrance: 150, temperature: -200, tint: 100,
+                red: 600, green: 400, blue: 700
+            }
+        },
+        {
+            name: "Desert Sun",
+            icon: "☀️",
+            desc: "Warm, high-contrast look for golden hour",
+            settings: {
+                brightness: 230, contrast: 220, exposure: 80,
+                highlights: 150, shadows: -50, saturation: 240,
+                vibrance: 100, temperature: 300, tint: -50,
+                red: 650, green: 550, blue: 450
+            }
+        },
+        {
+            name: "Moody Forest",
+            icon: "🌲",
+            desc: "Subdued colors with rich greens and cool shadows",
+            settings: {
+                brightness: 180, contrast: 230, exposure: -30,
+                highlights: -200, shadows: 100, saturation: 150,
+                vibrance: -50, temperature: 50, tint: -100,
+                red: 450, green: 550, blue: 480
+            }
+        }
+    ];
+
+    importArea.placeholder = "Example JSON Format:\n\n" + JSON.stringify(placeholderPresets, null, 2);
+
+    applyImportBtn.addEventListener('click', () => {
+        const rawJson = importArea.value.trim();
+        if (!rawJson) {
+            importStatus.textContent = "Please paste some JSON data first.";
+            importStatus.className = "status-msg error";
+            return;
+        }
+
+        try {
+            const imported = JSON.parse(rawJson);
+            if (!Array.isArray(imported)) {
+                throw new Error("Input must be a JSON array of presets.");
+            }
+
+            // Simple validation and import
+            imported.forEach(p => {
+                if (p.name && p.settings) {
+                    presets.push(p);
+                }
+            });
+
+            renderPresets();
+            importArea.value = '';
+            importStatus.textContent = `Successfully imported ${imported.length} presets!`;
+            importStatus.className = "status-msg success";
+            
+            setTimeout(() => {
+                importStatus.textContent = '';
+            }, 3000);
+
+        } catch (e) {
+            importStatus.textContent = "Error: " + e.message;
+            importStatus.className = "status-msg error";
+        }
     });
 
     // --- Image Handling & Rendering ---
@@ -273,18 +374,33 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.restore();
     }
 
+    let lastPreviewId = 0;
     async function fetchBackendPreview() {
         if (!currentFilename) return;
         
-        // We use the /preview route with base64 encoded config
+        const previewId = ++lastPreviewId;
         const config = btoa(JSON.stringify(currentState));
         const previewUrl = `/preview?config=${config}&v=${Date.now()}`;
         
         const img = new Image();
         img.onload = () => {
-            // Once high-res is loaded, we could swap it, but canvas is usually enough for interactive use.
-            // For this app, we'll just keep the canvas updated locally and use backend for final exports.
-            // However, the user wants "see real-time updates", so we've already done that with local canvas.
+            // Only update if this is still the latest request
+            if (previewId !== lastPreviewId) return;
+
+            // Draw the backend-processed image to the canvas
+            // The backend already applied all adjustments including rotation
+            const dW = img.width;
+            const dH = img.height;
+            const maxW = canvasContainer.clientWidth - 40;
+            const maxH = canvasContainer.clientHeight - 40;
+            const scale = Math.min(maxW / dW, maxH / dH, 1);
+            
+            mainCanvas.width = dW * scale;
+            mainCanvas.height = dH * scale;
+
+            ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
+            ctx.filter = 'none'; // Clear CSS filters as they are already applied in the backend
+            ctx.drawImage(img, 0, 0, mainCanvas.width, mainCanvas.height);
         };
         img.src = previewUrl;
     }
@@ -320,6 +436,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const btn = document.getElementById('copyJsonBtn');
         btn.textContent = "Copied!";
         setTimeout(() => btn.textContent = "Copy", 1000);
+    });
+
+    document.getElementById('copyPresetBtn').addEventListener('click', () => {
+        const presetJson = JSON.stringify(currentState, null, 4);
+        navigator.clipboard.writeText(presetJson).then(() => {
+            const btn = document.getElementById('copyPresetBtn');
+            const originalText = btn.textContent;
+            btn.textContent = "Copied!";
+            setTimeout(() => btn.textContent = originalText, 1500);
+        });
     });
 
     // --- Tabs ---

@@ -18,6 +18,20 @@ class ImageProcessor:
         if img.mode != 'RGB':
             img = img.convert('RGB')
         
+        # Normalize settings to floats
+        numeric_keys = [
+            'exposure', 'brightness', 'contrast', 'saturation', 
+            'temperature', 'tint', 'highlights', 'shadows', 
+            'whites', 'blacks', 'vibrance', 'clarity', 'dehaze',
+            'red', 'green', 'blue', 'rotation'
+        ]
+        for key in numeric_keys:
+            if key in settings:
+                try:
+                    settings[key] = float(settings[key])
+                except (ValueError, TypeError):
+                    pass
+
         # Convert to NumPy array for advanced processing (float32 for precision)
         arr = np.array(img).astype(np.float32) / 255.0
 
@@ -66,7 +80,17 @@ class ImageProcessor:
             b_val = settings['blacks'] / 1000.0
             arr = arr + (lumi < 0.3) * (b_val * 0.1)
 
-        # Clip after additions
+        # --- 3.5 RGB Channel Gains ---
+        if any(k in settings for k in ['red', 'green', 'blue']):
+            r_gain = settings.get('red', 500.0) / 500.0
+            g_gain = settings.get('green', 500.0) / 500.0
+            b_gain = settings.get('blue', 500.0) / 500.0
+            
+            arr[:,:,0] *= r_gain
+            arr[:,:,1] *= g_gain
+            arr[:,:,2] *= b_gain
+
+        # Clip after additions and gains
         arr = np.clip(arr, 0, 1)
 
         # --- 4. Presence: Vibrance, Clarity, Dehaze ---

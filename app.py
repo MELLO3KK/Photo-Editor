@@ -66,6 +66,15 @@ def process_image():
     data = request.json
     settings = data.get('settings', {})
     
+    # Normalize settings
+    defaults = ImageProcessor.get_default_settings()
+    for k in defaults:
+        if k in settings and k != 'crop':
+            try:
+                settings[k] = float(settings[k])
+            except (ValueError, TypeError):
+                pass
+    
     original_filename = session.get('original_file')
     if not original_filename or original_filename not in image_store:
         return jsonify({'error': 'No image found'}), 404
@@ -128,25 +137,25 @@ def preview_image():
         except Exception:
             settings = ImageProcessor.get_default_settings()
     else:
-        settings = {
-            'brightness': float(request.args.get('brightness', 200.0)),
-            'contrast': float(request.args.get('contrast', 200.0)),
-            'saturation': float(request.args.get('saturation', 200.0)),
-            'exposure': float(request.args.get('exposure', 0.0)),
-            'temperature': float(request.args.get('temperature', 0.0)),
-            'tint': float(request.args.get('tint', 0.0)),
-            'highlights': float(request.args.get('highlights', 0.0)),
-            'shadows': float(request.args.get('shadows', 0.0)),
-            'whites': float(request.args.get('whites', 0.0)),
-            'blacks': float(request.args.get('blacks', 0.0)),
-            'vibrance': float(request.args.get('vibrance', 0.0)),
-            'clarity': float(request.args.get('clarity', 0.0)),
-            'dehaze': float(request.args.get('dehaze', 0.0)),
-            'red': float(request.args.get('red', 500.0)),
-            'green': float(request.args.get('green', 500.0)),
-            'blue': float(request.args.get('blue', 500.0)),
-            'rotation': float(request.args.get('rotation', 0.0)),
-        }
+        # Use defaults from processor
+        settings = ImageProcessor.get_default_settings()
+        
+        # Override with query parameters if present
+        for key in settings:
+            if key in request.args:
+                try:
+                    settings[key] = float(request.args.get(key))
+                except (ValueError, TypeError):
+                    pass
+    
+    # Ensure all relevant settings are floats (especially if from config JSON)
+    defaults = ImageProcessor.get_default_settings()
+    for k in defaults:
+        if k in settings and k != 'crop':
+            try:
+                settings[k] = float(settings[k])
+            except (ValueError, TypeError):
+                pass
     
     import io
     from PIL import Image
@@ -156,7 +165,7 @@ def preview_image():
     # Return image directly
     from flask import send_file
     img_io = io.BytesIO()
-    processed_img.save(img_io, 'JPEG', quality=80)
+    processed_img.save(img_io, 'JPEG', quality=95)
     img_io.seek(0)
     return send_file(img_io, mimetype='image/jpeg')
 

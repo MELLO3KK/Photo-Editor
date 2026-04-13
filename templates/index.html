@@ -17,9 +17,6 @@
         <!-- Sidebar Controls -->
         <aside class="sidebar">
             <div class="brand">
-                <div class="preset-icon"
-                    style="width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white;">
-                    📸</div>
                 <h1>Photo<span>Editor</span> Pro</h1>
             </div>
 
@@ -32,83 +29,145 @@
                 <div id="settingsTab" class="tab-content active">
                     <form id="editorForm">
                         <section class="control-group">
-                            <h3>Basic Light <span>✨</span></h3>
+                            <h3>Basic Light</h3>
                             <div class="control">
-                                <label>Exposure <span class="val-badge" id="val-exposure">0</span></label>
-                                <input type="range" data-param="exposure" min="-1000" max="1000" step="1" value="0">
-                            </div>
-                            <div class="control">
-                                <label>Brightness <span class="val-badge" id="val-brightness">200</span></label>
-                                <input type="range" data-param="brightness" min="0" max="1000" step="1" value="200">
-                            </div>
-                            <div class="control">
-                                <label>Contrast <span class="val-badge" id="val-contrast">200</span></label>
-                                <input type="range" data-param="contrast" min="0" max="1000" step="1" value="200">
-                            </div>
-                        </section>
-
-                        <section class="control-group">
-                            <h3>Tone Control <span>🎭</span></h3>
-                            <div class="control">
-                                <label>Highlights <span class="val-badge" id="val-highlights">0</span></label>
-                                <input type="range" data-param="highlights" min="-1000" max="1000" step="1" value="0">
-                            </div>
-                            <div class="control">
-                                <label>Shadows <span class="val-badge" id="val-shadows">0</span></label>
-                                <input type="range" data-param="shadows" min="-1000" max="1000" step="1" value="0">
-                            </div>
-                            <div class="control">
-                                <label>Whites <span class="val-badge" id="val-whites">0</span></label>
-                                <input type="range" data-param="whites" min="-1000" max="1000" step="1" value="0">
-                            </div>
-                            <div class="control">
-                                <label>Blacks <span class="val-badge" id="val-blacks">0</span></label>
-                                <input type="range" data-param="blacks" min="-1000" max="1000" step="1" value="0">
-                            </div>
-                        </section>
-
-                        <section class="control-group">
-                            <h3>Color & Presence <span>🎨</span></h3>
-                            <div class="control">
-                                <label>Temperature <span class="val-badge" id="val-temperature">0</span></label>
-                                <input type="range" data-param="temperature" min="-1000" max="1000" step="1" value="0">
-                            </div>
-                            <div class="control">
-                                <label>Tint <span class="val-badge" id="val-tint">0</span></label>
-                                <input type="range" data-param="tint" min="-1000" max="1000" step="1" value="0">
-                            </div>
-                            <div class="control">
-                                <label>Vibrance <span class="val-badge" id="val-vibrance">0</span></label>
-                                <input type="range" data-param="vibrance" min="-1000" max="1000" step="1" value="0">
-                            </div>
-                            <div class="control">
-                                <label>Saturation <span class="val-badge" id="val-saturation">200</span></label>
-                                <input type="range" data-param="saturation" min="0" max="1000" step="1" value="200">
-                            </div>
-                            <div class="control">
-                                <label>Clarity <span class="val-badge" id="val-clarity">0</span></label>
-                                <input type="range" data-param="clarity" min="-1000" max="1000" step="1" value="0">
-                            </div>
-                            <div class="control">
-                                <label>Dehaze <span class="val-badge" id="val-dehaze">0</span></label>
-                                <input type="range" data-param="dehaze" min="-1000" max="1000" step="1" value="0">
-                            </div>
-                        </section>
-
-                        <section class="control-group">
-                            <h3>RGB Balancing <span>⚖️</span></h3>
-                            <div class="rgb-grid">
-                                <div class="control">
-                                    <label>Red</label>
-                                    <input type="number" data-param="red" min="0" max="1000" value="500" class="numeric-input">
+                                <label>Exposure</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="exposure">-</button>
+                                    <input type="number" data-param="exposure" min="-1000" max="1000" step="1" value="0">
+                                    <button type="button" class="step-btn plus" data-param="exposure">+</button>
                                 </div>
-                                <div class="control">
-                                    <label>Green</label>
-                                    <input type="number" data-param="green" min="0" max="1000" value="500" class="numeric-input">
+                            </div>
+                            <div class="control">
+                                <label>Brightness</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="brightness">-</button>
+                                    <input type="number" data-param="brightness" min="0" max="1000" step="1" value="200">
+                                    <button type="button" class="step-btn plus" data-param="brightness">+</button>
                                 </div>
-                                <div class="control">
-                                    <label>Blue</label>
-                                    <input type="number" data-param="blue" min="0" max="1000" value="500" class="numeric-input">
+                            </div>
+                            <div class="control">
+                                <label>Contrast</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="contrast">-</button>
+                                    <input type="number" data-param="contrast" min="0" max="1000" step="1" value="200">
+                                    <button type="button" class="step-btn plus" data-param="contrast">+</button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="control-group">
+                            <h3>Tone Control</h3>
+                            <div class="control">
+                                <label>Highlights</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="highlights">-</button>
+                                    <input type="number" data-param="highlights" min="-1000" max="1000" step="1" value="0">
+                                    <button type="button" class="step-btn plus" data-param="highlights">+</button>
+                                </div>
+                            </div>
+                            <div class="control">
+                                <label>Shadows</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="shadows">-</button>
+                                    <input type="number" data-param="shadows" min="-1000" max="1000" step="1" value="0">
+                                    <button type="button" class="step-btn plus" data-param="shadows">+</button>
+                                </div>
+                            </div>
+                            <div class="control">
+                                <label>Whites</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="whites">-</button>
+                                    <input type="number" data-param="whites" min="-1000" max="1000" step="1" value="0">
+                                    <button type="button" class="step-btn plus" data-param="whites">+</button>
+                                </div>
+                            </div>
+                            <div class="control">
+                                <label>Blacks</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="blacks">-</button>
+                                    <input type="number" data-param="blacks" min="-1000" max="1000" step="1" value="0">
+                                    <button type="button" class="step-btn plus" data-param="blacks">+</button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="control-group">
+                            <h3>Color & Presence</h3>
+                            <div class="control">
+                                <label>Temperature</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="temperature">-</button>
+                                    <input type="number" data-param="temperature" min="-1000" max="1000" step="1" value="0">
+                                    <button type="button" class="step-btn plus" data-param="temperature">+</button>
+                                </div>
+                            </div>
+                            <div class="control">
+                                <label>Tint</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="tint">-</button>
+                                    <input type="number" data-param="tint" min="-1000" max="1000" step="1" value="0">
+                                    <button type="button" class="step-btn plus" data-param="tint">+</button>
+                                </div>
+                            </div>
+                            <div class="control">
+                                <label>Vibrance</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="vibrance">-</button>
+                                    <input type="number" data-param="vibrance" min="-1000" max="1000" step="1" value="0">
+                                    <button type="button" class="step-btn plus" data-param="vibrance">+</button>
+                                </div>
+                            </div>
+                            <div class="control">
+                                <label>Saturation</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="saturation">-</button>
+                                    <input type="number" data-param="saturation" min="0" max="1000" step="1" value="200">
+                                    <button type="button" class="step-btn plus" data-param="saturation">+</button>
+                                </div>
+                            </div>
+                            <div class="control">
+                                <label>Clarity</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="clarity">-</button>
+                                    <input type="number" data-param="clarity" min="-1000" max="1000" step="1" value="0">
+                                    <button type="button" class="step-btn plus" data-param="clarity">+</button>
+                                </div>
+                            </div>
+                            <div class="control">
+                                <label>Dehaze</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="dehaze">-</button>
+                                    <input type="number" data-param="dehaze" min="-1000" max="1000" step="1" value="0">
+                                    <button type="button" class="step-btn plus" data-param="dehaze">+</button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="control-group">
+                            <h3>RGB Balancing</h3>
+                            <div class="control">
+                                <label>Red</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="red">-</button>
+                                    <input type="number" data-param="red" min="0" max="1000" value="500">
+                                    <button type="button" class="step-btn plus" data-param="red">+</button>
+                                </div>
+                            </div>
+                            <div class="control">
+                                <label>Green</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="green">-</button>
+                                    <input type="number" data-param="green" min="0" max="1000" value="500">
+                                    <button type="button" class="step-btn plus" data-param="green">+</button>
+                                </div>
+                            </div>
+                            <div class="control">
+                                <label>Blue</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="blue">-</button>
+                                    <input type="number" data-param="blue" min="0" max="1000" value="500">
+                                    <button type="button" class="step-btn plus" data-param="blue">+</button>
                                 </div>
                             </div>
                         </section>
@@ -119,11 +178,22 @@
                     <div id="presetsLibrary" class="presets-library">
                         <!-- Presets will be injected here -->
                     </div>
+                    
+                    <div class="import-section">
+                        <div class="control-divider">Bulk Import Presets 📥</div>
+                        <p class="import-hint">Paste JSON array of presets to expand your library</p>
+                        <textarea id="presetImportArea" class="import-textarea" spellcheck="false"></textarea>
+                        <button id="applyImportBtn" class="primary-btn full-width">Import Presets</button>
+                        <div id="importStatus" class="status-msg"></div>
+                    </div>
                 </div>
             </div>
 
             <div class="sidebar-footer">
-                <button id="resetAllBtn" class="secondary-btn">Hard Reset</button>
+                <div class="btn-grid">
+                    <button id="resetAllBtn" class="secondary-btn">Hard Reset</button>
+                    <button id="copyPresetBtn" class="secondary-btn">Copy Preset</button>
+                </div>
                 <div class="btn-grid">
                     <button id="uploadBtn" class="primary-btn">Import</button>
                     <button id="exportBtn" class="primary-btn" disabled>Export</button>
