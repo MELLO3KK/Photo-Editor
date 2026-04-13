@@ -195,6 +195,20 @@
                 </section>
 
                 <section class="control-group">
+                    <h3>Presets</h3>
+                    <div class="preset-input">
+                        <textarea id="presetJsonInput" placeholder='Paste JSON Presets here...' class="custom-textarea"></textarea>
+                        <div class="btn-grid" style="margin-top: 10px;">
+                            <button type="button" id="loadExampleBtn" class="secondary-btn small-btn">Load Example</button>
+                            <button type="button" id="applyPresetsBtn" class="primary-btn small-btn">Parse & Show</button>
+                        </div>
+                    </div>
+                    <div id="presetsContainer" class="presets-grid">
+                        <!-- Preset cards will be injected here -->
+                    </div>
+                </section>
+
+                <section class="control-group">
                     <h3>History</h3>
                     <div class="btn-grid">
                         <button type="button" id="undoBtn" disabled>Undo</button>

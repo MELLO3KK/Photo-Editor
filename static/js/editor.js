@@ -507,6 +507,114 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+
+    // Presets System
+    const presetJsonInput = document.getElementById('presetJsonInput');
+    const loadExampleBtn = document.getElementById('loadExampleBtn');
+    const applyPresetsBtn = document.getElementById('applyPresetsBtn');
+    const presetsContainer = document.getElementById('presetsContainer');
+
+    const examplePresets = [
+        {
+            "name": "Golden Hour",
+            "settings": {
+                "exposure": 0.2,
+                "temperature": 0.6,
+                "vibrance": 0.3,
+                "highlights": -0.1,
+                "shadows": 0.2
+            }
+        },
+        {
+            "name": "Cool B&W",
+            "settings": {
+                "saturation": 0,
+                "contrast": 1.2,
+                "temperature": -0.4,
+                "blacks": -0.1
+            }
+        },
+        {
+            "name": "Vivid",
+            "settings": {
+                "vibrance": 0.5,
+                "saturation": 1.2,
+                "clarity": 0.3,
+                "exposure": 0.1
+            }
+        },
+        {
+            "name": "Matte Dark",
+            "settings": {
+                "exposure": -0.3,
+                "contrast": 0.8,
+                "shadows": 0.5,
+                "blacks": 0.3,
+                "saturation": 0.7
+            }
+        }
+    ];
+
+    loadExampleBtn.addEventListener('click', () => {
+        presetJsonInput.value = JSON.stringify(examplePresets, null, 4);
+        parseAndDisplayPresets();
+    });
+
+    applyPresetsBtn.addEventListener('click', parseAndDisplayPresets);
+
+    function parseAndDisplayPresets() {
+        const jsonText = presetJsonInput.value.trim();
+        if (!jsonText) return;
+
+        try {
+            const presets = JSON.parse(jsonText);
+            if (!Array.isArray(presets)) {
+                alert('JSON must be an array of presets.');
+                return;
+            }
+
+            presetsContainer.innerHTML = '';
+            presets.forEach(preset => {
+                if (preset.name && preset.settings) {
+                    createPresetCard(preset);
+                }
+            });
+        } catch (e) {
+            alert('Invalid JSON format: ' + e.message);
+        }
+    }
+
+    function createPresetCard(preset) {
+        const card = document.createElement('div');
+        card.className = 'preset-card';
+        card.innerHTML = `
+            <div class="preset-icon">✨</div>
+            <h4>${preset.name}</h4>
+        `;
+        card.addEventListener('click', () => {
+            applyPreset(preset.settings);
+        });
+        presetsContainer.appendChild(card);
+    }
+
+    function applyPreset(settings) {
+        // Reset to default first (optional, but usually cleaner)
+        const defaults = {
+            exposure: 0, brightness: 1, contrast: 1, highlights: 0, shadows: 0,
+            whites: 0, blacks: 0, temperature: 0, tint: 0, vibrance: 0,
+            saturation: 1, clarity: 0, dehaze: 0, red: 1, green: 1, blue: 1
+        };
+
+        const newState = {
+            ...JSON.parse(history[historyIndex]), // Start with current actual state (rotation/crop)
+            ...defaults, // Reset color settings
+            ...settings  // Apply preset settings
+        };
+
+        applyState(newState);
+        saveState();
+    }
+
     function showLoading(show) {
         loadingOverlay.classList.toggle('active', show);
     }
