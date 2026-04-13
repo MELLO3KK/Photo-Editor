@@ -142,6 +142,14 @@
                                     <button type="button" class="step-btn plus" data-param="dehaze">+</button>
                                 </div>
                             </div>
+                            <div class="control">
+                                <label>Sharpness</label>
+                                <div class="numeric-control">
+                                    <button type="button" class="step-btn minus" data-param="sharpness">-</button>
+                                    <input type="number" data-param="sharpness" min="0" max="500" step="1" value="100">
+                                    <button type="button" class="step-btn plus" data-param="sharpness">+</button>
+                                </div>
+                            </div>
                         </section>
 
                         <section class="control-group">
@@ -180,10 +188,11 @@
                     </div>
                     
                     <div class="import-section">
-                        <div class="control-divider">Bulk Import Presets 📥</div>
+                        <div class="control-divider">Bulk Import Presets</div>
                         <p class="import-hint">Paste JSON array of presets to expand your library</p>
                         <textarea id="presetImportArea" class="import-textarea" spellcheck="false"></textarea>
                         <button id="applyImportBtn" class="primary-btn full-width">Import Presets</button>
+                        <button id="copyTemplateBtn" class="secondary-btn full-width" style="margin-top: 8px;">Copy Format Template</button>
                         <div id="importStatus" class="status-msg"></div>
                     </div>
                 </div>

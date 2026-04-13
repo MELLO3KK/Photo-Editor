@@ -23,7 +23,7 @@ class ImageProcessor:
             'exposure', 'brightness', 'contrast', 'saturation', 
             'temperature', 'tint', 'highlights', 'shadows', 
             'whites', 'blacks', 'vibrance', 'clarity', 'dehaze',
-            'red', 'green', 'blue', 'rotation'
+            'red', 'green', 'blue', 'rotation', 'sharpness'
         ]
         for key in numeric_keys:
             if key in settings:
@@ -149,6 +149,11 @@ class ImageProcessor:
             b = b.point(lambda i: i * b_gain)
             img = Image.merge('RGB', (r, g, b))
             
+        # Sharpness
+        if 'sharpness' in settings and settings['sharpness'] != 100.0:
+            enhancer = ImageEnhance.Sharpness(img)
+            img = enhancer.enhance(settings['sharpness'] / 100.0)
+            
         # Rotation
         if 'rotation' in settings and settings['rotation'] != 0:
             img = img.rotate(-settings['rotation'], expand=True) # Counter-clockwise to match JS
@@ -182,6 +187,7 @@ class ImageProcessor:
             'green': 500,
             'blue': 500,
             'rotation': 0,
+            'sharpness': 100,
             'crop': None
         }
 

@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         temperature: 0, tint: 0, vibrance: 0, saturation: 200,
         clarity: 0, dehaze: 0,
         red: 500, green: 500, blue: 500,
-        rotation: 0, crop: null
+        rotation: 0, sharpness: 100, crop: null
     };
 
     let currentState = { ...DEFAULTS };
@@ -174,32 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Preset Library ---
-    let presets = [
-        {
-            name: "Classic Cinema",
-            icon: "🎬",
-            desc: "Contrast-rich teal & orange grade",
-            settings: { exposure: 20, contrast: 240, temperature: 150, tint: -50, vibrance: 100, blue: 520, red: 480 }
-        },
-        {
-            name: "Vintage Film",
-            icon: "🎞️",
-            desc: "Washed out shadows with warm tones",
-            settings: { exposure: -10, contrast: 160, blacks: 150, shadows: 100, temperature: 300, saturation: 160 }
-        },
-        {
-            name: "High Contrast B&W",
-            icon: "🌓",
-            desc: "Punchy monochrome look",
-            settings: { saturation: 0, contrast: 300, highlights: 100, blacks: -200, clarity: 300 }
-        },
-        {
-            name: "Deep Matte",
-            icon: "🌫️",
-            desc: "Soft blacks and moody presence",
-            settings: { exposure: -50, blacks: 300, contrast: 180, dehaze: -100, vibrance: -200 }
-        }
-    ];
+    let presets = [];
 
     function renderPresets() {
         const presetsLibrary = document.getElementById('presetsLibrary');
@@ -230,35 +205,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const placeholderPresets = [
         {
             name: "Neon Nights",
-            icon: "🌆",
             desc: "Vibrant city vibes with deep blues and neons",
             settings: {
-                brightness: 210, contrast: 250, exposure: 50,
-                highlights: -100, shadows: 50, saturation: 280,
-                vibrance: 150, temperature: -200, tint: 100,
-                red: 600, green: 400, blue: 700
+                exposure: 50, brightness: 210, contrast: 250, 
+                highlights: -100, shadows: 50, whites: 0, blacks: 0,
+                temperature: -200, tint: 100, vibrance: 150, saturation: 280,
+                clarity: 0, dehaze: 0, red: 600, green: 400, blue: 700,
+                sharpness: 100
             }
         },
         {
             name: "Desert Sun",
-            icon: "☀️",
             desc: "Warm, high-contrast look for golden hour",
             settings: {
-                brightness: 230, contrast: 220, exposure: 80,
-                highlights: 150, shadows: -50, saturation: 240,
-                vibrance: 100, temperature: 300, tint: -50,
-                red: 650, green: 550, blue: 450
+                exposure: 80, brightness: 230, contrast: 220, 
+                highlights: 150, shadows: -50, whites: 0, blacks: 0,
+                temperature: 300, tint: -50, vibrance: 100, saturation: 240,
+                clarity: 0, dehaze: 0, red: 650, green: 550, blue: 450,
+                sharpness: 100
             }
         },
         {
             name: "Moody Forest",
-            icon: "🌲",
             desc: "Subdued colors with rich greens and cool shadows",
             settings: {
-                brightness: 180, contrast: 230, exposure: -30,
-                highlights: -200, shadows: 100, saturation: 150,
-                vibrance: -50, temperature: 50, tint: -100,
-                red: 450, green: 550, blue: 480
+                exposure: -30, brightness: 180, contrast: 230, 
+                highlights: -200, shadows: 100, whites: 0, blacks: 0,
+                temperature: 50, tint: -100, vibrance: -50, saturation: 150,
+                clarity: 0, dehaze: 0, red: 450, green: 550, blue: 480,
+                sharpness: 100
             }
         }
     ];
@@ -299,6 +274,16 @@ document.addEventListener('DOMContentLoaded', () => {
             importStatus.textContent = "Error: " + e.message;
             importStatus.className = "status-msg error";
         }
+    });
+    
+    document.getElementById('copyTemplateBtn').addEventListener('click', () => {
+        const templateJson = JSON.stringify(placeholderPresets, null, 4);
+        navigator.clipboard.writeText(templateJson).then(() => {
+            const btn = document.getElementById('copyTemplateBtn');
+            const originalText = btn.textContent;
+            btn.textContent = "Copied Template!";
+            setTimeout(() => btn.textContent = originalText, 2000);
+        });
     });
 
     // --- Image Handling & Rendering ---
