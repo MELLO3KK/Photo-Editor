@@ -17,25 +17,16 @@ def allowed_file(filename):
 
 @app.route('/')
 def index():
-    # Get settings from query parameters for the Python-only preview
-    settings = {
-        'brightness': request.args.get('brightness', '200'),
-        'contrast': request.args.get('contrast', '200'),
-        'saturation': request.args.get('saturation', '200'),
-        'exposure': request.args.get('exposure', '0'),
-        'temperature': request.args.get('temperature', '0'),
-        'tint': request.args.get('tint', '0'),
-        'highlights': request.args.get('highlights', '0'),
-        'shadows': request.args.get('shadows', '0'),
-        'whites': request.args.get('whites', '0'),
-        'blacks': request.args.get('blacks', '0'),
-        'vibrance': request.args.get('vibrance', '0'),
-        'clarity': request.args.get('clarity', '0'),
-        'dehaze': request.args.get('dehaze', '0'),
-        'red': request.args.get('red', '500'),
-        'green': request.args.get('green', '500'),
-        'blue': request.args.get('blue', '500'),
-    }
+    # Get default settings from processor
+    defaults = ImageProcessor.get_default_settings()
+    settings = {k: request.args.get(k, str(v)) for k, v in defaults.items() if k != 'crop'}
+    
+    # Cast to appropriate types
+    for k, v in settings.items():
+        try:
+            settings[k] = float(v) if '.' in v or v in ['0', '200', '500'] else v
+        except:
+            pass
     
     # Generate preview URL if there is an original file in session
     preview_url = None
@@ -127,26 +118,35 @@ def preview_image():
     if not filename or filename not in image_store:
         return "No image uploaded", 400
         
-    # Extract settings from query parameters
-    # ... (rest of settings extraction)
-    settings = {
-        'brightness': float(request.args.get('brightness', 200.0)),
-        'contrast': float(request.args.get('contrast', 200.0)),
-        'saturation': float(request.args.get('saturation', 200.0)),
-        'exposure': float(request.args.get('exposure', 0.0)),
-        'temperature': float(request.args.get('temperature', 0.0)),
-        'tint': float(request.args.get('tint', 0.0)),
-        'highlights': float(request.args.get('highlights', 0.0)),
-        'shadows': float(request.args.get('shadows', 0.0)),
-        'whites': float(request.args.get('whites', 0.0)),
-        'blacks': float(request.args.get('blacks', 0.0)),
-        'vibrance': float(request.args.get('vibrance', 0.0)),
-        'clarity': float(request.args.get('clarity', 0.0)),
-        'dehaze': float(request.args.get('dehaze', 0.0)),
-        'red': float(request.args.get('red', 500.0)),
-        'green': float(request.args.get('green', 500.0)),
-        'blue': float(request.args.get('blue', 500.0)),
-    }
+    # Extract settings from query parameters or a JSON config
+    config_param = request.args.get('config')
+    if config_param:
+        import base64
+        import json
+        try:
+            settings = json.loads(base64.b64decode(config_param).decode('utf-8'))
+        except Exception:
+            settings = ImageProcessor.get_default_settings()
+    else:
+        settings = {
+            'brightness': float(request.args.get('brightness', 200.0)),
+            'contrast': float(request.args.get('contrast', 200.0)),
+            'saturation': float(request.args.get('saturation', 200.0)),
+            'exposure': float(request.args.get('exposure', 0.0)),
+            'temperature': float(request.args.get('temperature', 0.0)),
+            'tint': float(request.args.get('tint', 0.0)),
+            'highlights': float(request.args.get('highlights', 0.0)),
+            'shadows': float(request.args.get('shadows', 0.0)),
+            'whites': float(request.args.get('whites', 0.0)),
+            'blacks': float(request.args.get('blacks', 0.0)),
+            'vibrance': float(request.args.get('vibrance', 0.0)),
+            'clarity': float(request.args.get('clarity', 0.0)),
+            'dehaze': float(request.args.get('dehaze', 0.0)),
+            'red': float(request.args.get('red', 500.0)),
+            'green': float(request.args.get('green', 500.0)),
+            'blue': float(request.args.get('blue', 500.0)),
+            'rotation': float(request.args.get('rotation', 0.0)),
+        }
     
     import io
     from PIL import Image

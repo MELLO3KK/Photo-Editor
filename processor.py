@@ -138,6 +138,30 @@ class ImageProcessor:
         return img
 
     @staticmethod
+    def get_default_settings():
+        """Returns the neutral/default settings for all parameters."""
+        return {
+            'exposure': 0,
+            'brightness': 200,
+            'contrast': 200,
+            'saturation': 200,
+            'temperature': 0,
+            'tint': 0,
+            'highlights': 0,
+            'shadows': 0,
+            'whites': 0,
+            'blacks': 0,
+            'vibrance': 0,
+            'clarity': 0,
+            'dehaze': 0,
+            'red': 500,
+            'green': 500,
+            'blue': 500,
+            'rotation': 0,
+            'crop': None
+        }
+
+    @staticmethod
     def crop_image(image_path, crop_params):
         """
         crop_params: [x, y, width, height]
