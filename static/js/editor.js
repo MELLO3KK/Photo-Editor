@@ -207,33 +207,41 @@ document.addEventListener('DOMContentLoaded', () => {
             name: "Neon Nights",
             desc: "Vibrant city vibes with deep blues and neons",
             settings: {
-                exposure: 50, brightness: 210, contrast: 250, 
-                highlights: -100, shadows: 50, whites: 0, blacks: 0,
-                temperature: -200, tint: 100, vibrance: 150, saturation: 280,
-                clarity: 0, dehaze: 0, red: 600, green: 400, blue: 700,
-                sharpness: 100
+                exposure: 10, brightness: 180, contrast: 240, 
+                highlights: -50, shadows: 40, blacks: -20,
+                temperature: -120, tint: 80, vibrance: 60, saturation: 240,
+                clarity: 20
             }
         },
         {
             name: "Desert Sun",
             desc: "Warm, high-contrast look for golden hour",
             settings: {
-                exposure: 80, brightness: 230, contrast: 220, 
-                highlights: 150, shadows: -50, whites: 0, blacks: 0,
-                temperature: 300, tint: -50, vibrance: 100, saturation: 240,
-                clarity: 0, dehaze: 0, red: 650, green: 550, blue: 450,
-                sharpness: 100
+                exposure: 30, contrast: 210, 
+                highlights: 60, shadows: -20,
+                temperature: 150, tint: 20, vibrance: 40, saturation: 220,
+                clarity: 15, dehaze: 10
             }
         },
         {
             name: "Moody Forest",
             desc: "Subdued colors with rich greens and cool shadows",
             settings: {
-                exposure: -30, brightness: 180, contrast: 230, 
-                highlights: -200, shadows: 100, whites: 0, blacks: 0,
-                temperature: 50, tint: -100, vibrance: -50, saturation: 150,
-                clarity: 0, dehaze: 0, red: 450, green: 550, blue: 480,
-                sharpness: 100
+                exposure: -20, brightness: 170, contrast: 210, 
+                highlights: -80, shadows: 60, whites: -10, blacks: 20,
+                temperature: 20, tint: -40, vibrance: -20, saturation: 160,
+                clarity: 25
+            }
+        },
+        {
+            name: "Normal",
+            desc: "Original unedited photo settings",
+            settings: {
+                exposure: 0, brightness: 200, contrast: 200, 
+                highlights: 0, shadows: 0, whites: 0, blacks: 0,
+                temperature: 0, tint: 0, vibrance: 0, saturation: 200,
+                clarity: 0, dehaze: 0, red: 500, green: 500, blue: 500,
+                rotation: 0, sharpness: 100
             }
         }
     ];
