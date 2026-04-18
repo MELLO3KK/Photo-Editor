@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctx = mainCanvas.getContext('2d');
     const canvasContainer = document.getElementById('canvasContainer');
     const dropZone = document.getElementById('dropZone');
-    const loadingOverlay = document.getElementById('loadingOverlay');
+
     const jsonStatus = document.getElementById('jsonStatus');
     const editorForm = document.getElementById('editorForm');
 
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData();
         formData.append('file', file);
 
-        showLoading(true);
+
         try {
             const resp = await fetch('/upload', { method: 'POST', body: formData });
             const data = await resp.json();
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 hardReset();
             }
         } catch (e) { console.error(e); }
-        finally { showLoading(false); }
+        finally {}
     }
 
     function loadImage(url) {
@@ -509,13 +509,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    function showLoading(show) {
-        loadingOverlay.classList.toggle('active', show);
-    }
+
 
     // --- Export ---
     document.getElementById('exportBtn').addEventListener('click', async () => {
-        showLoading(true);
+
         try {
             const resp = await fetch('/export', {
                 method: 'POST',
@@ -531,6 +529,6 @@ document.addEventListener('DOMContentLoaded', () => {
             a.click();
             window.URL.revokeObjectURL(url);
         } catch (e) { console.error(e); }
-        finally { showLoading(false); }
+        finally {}
     });
 });
