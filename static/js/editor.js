@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let historyIndex = 0;
     let isUpdatingFromCode = false;
     let isUpdatingFromUI = false;
+    let activePresetId = null;
 
     // --- DOM Elements ---
     const mainCanvas = document.getElementById('mainCanvas');
@@ -62,8 +63,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentState[param] = val;
 
+        activePresetId = null; // Clear active preset on manual adjustment
         syncStateToEditor();
         renderPreview();
+        renderPresets();
     });
 
     // --- Step Buttons (+/-) ---
@@ -114,10 +117,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             
             currentState = filteredState;
+            activePresetId = null; // Clear active state on manual JSON edit
             updateUIFromState(currentState);
             jsonStatus.textContent = "State Synced";
             jsonStatus.classList.remove('error');
             renderPreview();
+            renderPresets(); // Update visual active state
         } catch (e) {
             jsonStatus.textContent = "Invalid JSON Structure";
             jsonStatus.classList.add('error');
@@ -133,7 +138,11 @@ document.addEventListener('DOMContentLoaded', () => {
         saveHistory();
     }
 
-    document.getElementById('resetAllBtn').addEventListener('click', () => hardReset());
+    document.getElementById('resetAllBtn').addEventListener('click', () => {
+        activePresetId = null;
+        hardReset();
+        renderPresets();
+    });
 
     // --- History System ---
     function saveHistory() {
@@ -178,10 +187,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderPresets() {
         const presetsLibrary = document.getElementById('presetsLibrary');
+        const emptyState = document.getElementById('presetsEmptyState');
+        const clearBtn = document.getElementById('clearPresetsBtn');
+        
         presetsLibrary.innerHTML = '';
-        presets.forEach(p => {
+        
+        if (presets.length === 0) {
+            presetsLibrary.style.display = 'none';
+            emptyState.style.display = 'flex';
+            clearBtn.style.opacity = '0.3';
+            clearBtn.style.pointerEvents = 'none';
+            return;
+        }
+
+        presetsLibrary.style.display = 'grid';
+        emptyState.style.display = 'none';
+        clearBtn.style.opacity = '1';
+        clearBtn.style.pointerEvents = 'all';
+
+        presets.forEach((p, index) => {
             const tile = document.createElement('div');
-            tile.className = 'preset-tile';
+            tile.className = `preset-tile ${activePresetId === index ? 'active' : ''}`;
             tile.innerHTML = `
                 <div class="info">
                     <h4>${p.name}</h4>
@@ -189,11 +215,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             tile.addEventListener('click', () => {
+                activePresetId = index;
                 hardReset({ ...DEFAULTS, ...p.settings });
+                renderPresets();
             });
             presetsLibrary.appendChild(tile);
         });
     }
+
+    // --- Clear All Presets ---
+    document.getElementById('clearPresetsBtn').addEventListener('click', () => {
+        if (presets.length === 0) return;
+        
+        const confirmClear = confirm("Are you sure you want to clear all presets? This cannot be undone.");
+        if (confirmClear) {
+            presets = [];
+            activePresetId = null;
+            renderPresets();
+            
+            importStatus.textContent = "All presets cleared.";
+            importStatus.className = "status-msg";
+            setTimeout(() => importStatus.textContent = '', 3000);
+        }
+    });
 
     renderPresets();
 

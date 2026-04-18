@@ -420,13 +420,71 @@ button {
     background: var(--accent-soft);
 }
 
-
-.preset-tile .info h4 {
-    font-size: 0.9rem;
-    margin-bottom: 2px;
+.preset-tile.active {
+    border-left: 4px solid var(--accent);
+    background: var(--accent-soft);
+    box-shadow: 0 0 20px hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.15);
+    border-color: hsla(var(--accent-h), var(--accent-s), var(--accent-l), 0.3);
 }
 
-.preset-tile .info p {
+.preset-tile.active h4 {
+    color: var(--accent);
+    font-weight: 700;
+}
+
+.preset-tile.active p {
+    color: var(--text-secondary);
+}
+
+.presets-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.presets-header .control-divider {
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+.danger-btn {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.danger-btn:hover {
+    background: #ef4444;
+    color: white;
+}
+
+.empty-presets {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed var(--border-color);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.empty-presets p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.empty-hint {
     font-size: 0.75rem;
     color: var(--text-muted);
 }
