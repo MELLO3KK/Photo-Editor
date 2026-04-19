@@ -17,8 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let activePresetId = null;
 
     // --- DOM Elements ---
-    const mainCanvas = document.getElementById('mainCanvas');
-    const ctx = mainCanvas.getContext('2d');
+    const mainPreview = document.getElementById('mainPreview');
     const canvasContainer = document.getElementById('canvasContainer');
     const dropZone = document.getElementById('dropZone');
 
@@ -339,7 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Image Handling & Rendering ---
-    let originalImage = null;
     let currentFilename = null;
 
     async function handleUpload(file) {
@@ -361,54 +359,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadImage(url) {
-        const img = new Image();
-        img.onload = () => {
-            originalImage = img;
-            canvasContainer.classList.add('has-image');
-            mainCanvas.style.display = 'block';
-            renderPreview();
-        };
-        img.src = url;
+        mainPreview.src = url;
+        mainPreview.style.display = 'block';
+        canvasContainer.classList.add('has-image');
+        renderPreview();
     }
 
     // Debounced high-quality backend preview
     let previewTimeout = null;
     function renderPreview() {
-        if (!originalImage) return;
-
-        // Perform fast local canvas preview for immediate feedback
-        renderCanvas();
+        if (!currentFilename) return;
 
         // Perform backend preview for precision (debounced)
         clearTimeout(previewTimeout);
         previewTimeout = setTimeout(fetchBackendPreview, 500);
-    }
-
-    function renderCanvas() {
-        const dW = originalImage.width;
-        const dH = originalImage.height;
-        const maxW = canvasContainer.clientWidth - 40;
-        const maxH = canvasContainer.clientHeight - 40;
-        const scale = Math.min(maxW / dW, maxH / dH, 1);
-        
-        mainCanvas.width = dW * scale;
-        mainCanvas.height = dH * scale;
-
-        ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-        
-        // Basic filters for local preview (approximate)
-        const exp = Math.pow(2, currentState.exposure / 200.0);
-        const bri = (currentState.brightness / 200.0) * exp;
-        const con = currentState.contrast / 200.0;
-        const sat = currentState.saturation / 200.0;
-        
-        ctx.filter = `brightness(${bri}) contrast(${con}) saturate(${sat})`;
-        
-        ctx.save();
-        ctx.translate(mainCanvas.width / 2, mainCanvas.height / 2);
-        ctx.rotate((currentState.rotation * Math.PI) / 180);
-        ctx.drawImage(originalImage, -mainCanvas.width / 2, -mainCanvas.height / 2, mainCanvas.width, mainCanvas.height);
-        ctx.restore();
     }
 
     let lastPreviewId = 0;
@@ -424,20 +388,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Only update if this is still the latest request
             if (previewId !== lastPreviewId) return;
 
-            // Draw the backend-processed image to the canvas
-            // The backend already applied all adjustments including rotation
-            const dW = img.width;
-            const dH = img.height;
-            const maxW = canvasContainer.clientWidth - 40;
-            const maxH = canvasContainer.clientHeight - 40;
-            const scale = Math.min(maxW / dW, maxH / dH, 1);
-            
-            mainCanvas.width = dW * scale;
-            mainCanvas.height = dH * scale;
-
-            ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-            ctx.filter = 'none'; // Clear CSS filters as they are already applied in the backend
-            ctx.drawImage(img, 0, 0, mainCanvas.width, mainCanvas.height);
+            mainPreview.src = previewUrl;
         };
         img.src = previewUrl;
     }
