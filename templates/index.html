@@ -227,6 +227,8 @@
                     <div class="transform-controls">
                         <button id="rotateLeft" class="icon-btn" title="Rotate Left">↺</button>
                         <button id="rotateRight" class="icon-btn" title="Rotate Right">↻</button>
+                        <button id="flipHorizontal" class="icon-btn" title="Flip Horizontal">↔</button>
+                        <button id="flipVertical" class="icon-btn" title="Flip Vertical">↕</button>
                         <button id="cropBtn" class="icon-btn" title="Crop">✂️</button>
                     </div>
                     <div class="history-controls">
@@ -241,6 +243,12 @@
                         <p>Drag an image here to start</p>
                     </div>
                     <img id="mainPreview" style="max-width: 100%; max-height: 100%; object-fit: contain; display: none;">
+                    
+                    <!-- Loading Overlay -->
+                    <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Processing...</p>
+                    </div>
                 </div>
             </div>
 

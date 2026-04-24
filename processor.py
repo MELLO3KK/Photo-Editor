@@ -158,6 +158,12 @@ class ImageProcessor:
         if 'rotation' in settings and settings['rotation'] != 0:
             img = img.rotate(-settings['rotation'], expand=True) # Counter-clockwise to match JS
 
+        # Flip
+        if settings.get('flip_h'):
+            img = ImageOps.mirror(img)
+        if settings.get('flip_v'):
+            img = ImageOps.flip(img)
+
         # Crop (x, y, w, h)
         if 'crop' in settings and settings['crop']:
             crop = settings['crop']
@@ -187,6 +193,8 @@ class ImageProcessor:
             'green': 500,
             'blue': 500,
             'rotation': 0,
+            'flip_h': False,
+            'flip_v': False,
             'sharpness': 100,
             'crop': None
         }

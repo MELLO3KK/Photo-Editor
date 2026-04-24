@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
         temperature: 0, tint: 0, vibrance: 0, saturation: 200,
         clarity: 0, dehaze: 0,
         red: 500, green: 500, blue: 500,
-        rotation: 0, sharpness: 100, crop: null
+        rotation: 0, flip_h: false, flip_v: false, sharpness: 100, crop: null
     };
 
     let currentState = { ...DEFAULTS };
@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainPreview = document.getElementById('mainPreview');
     const canvasContainer = document.getElementById('canvasContainer');
     const dropZone = document.getElementById('dropZone');
+    const loadingOverlay = document.getElementById('loadingOverlay');
 
     const jsonStatus = document.getElementById('jsonStatus');
     const editorForm = document.getElementById('editorForm');
@@ -343,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleUpload(file) {
         const formData = new FormData();
         formData.append('file', file);
-
+        loadingOverlay.style.display = 'flex';
 
         try {
             const resp = await fetch('/upload', { method: 'POST', body: formData });
@@ -355,7 +356,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 hardReset();
             }
         } catch (e) { console.error(e); }
-        finally {}
+        finally {
+            loadingOverlay.style.display = 'none';
+        }
     }
 
     function loadImage(url) {
@@ -379,6 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchBackendPreview() {
         if (!currentFilename) return;
         
+        loadingOverlay.style.display = 'flex';
         const previewId = ++lastPreviewId;
         const config = btoa(JSON.stringify(currentState));
         const previewUrl = `/preview?config=${config}&v=${Date.now()}`;
@@ -389,7 +393,11 @@ document.addEventListener('DOMContentLoaded', () => {
             if (previewId !== lastPreviewId) return;
 
             mainPreview.src = previewUrl;
+            loadingOverlay.style.display = 'none';
         };
+        img.onerror = () => {
+            if (previewId === lastPreviewId) loadingOverlay.style.display = 'none';
+        }
         img.src = previewUrl;
     }
 
@@ -429,6 +437,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('rotateLeft').addEventListener('click', () => {
         currentState.rotation = (currentState.rotation - 90) % 360;
+        syncStateToEditor();
+        renderPreview();
+    });
+
+    document.getElementById('flipHorizontal').addEventListener('click', () => {
+        currentState.flip_h = !currentState.flip_h;
+        syncStateToEditor();
+        renderPreview();
+    });
+
+    document.getElementById('flipVertical').addEventListener('click', () => {
+        currentState.flip_v = !currentState.flip_v;
         syncStateToEditor();
         renderPreview();
     });
