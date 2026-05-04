@@ -23,6 +23,7 @@
             <div class="tabs-nav">
                 <button class="tab-btn active" data-tab="settings">Settings</button>
                 <button class="tab-btn" data-tab="presets">Presets</button>
+                <button class="tab-btn" data-tab="output">Output</button>
             </div>
 
             <div class="controls-scroll">
@@ -183,6 +184,13 @@
                 </div>
 
                 <div id="presetsTab" class="tab-content">
+                    <div class="save-preset-panel">
+                        <div class="control-divider">Save Current Style</div>
+                        <input id="presetNameInput" class="text-input" type="text" maxlength="40" placeholder="Preset name">
+                        <button id="savePresetBtn" class="primary-btn full-width">Save Preset</button>
+                        <div id="savePresetStatus" class="status-msg"></div>
+                    </div>
+
                     <div class="presets-header">
                         <div class="control-divider">Preserved Styles</div>
                         <button id="clearPresetsBtn" class="danger-btn mini">Clear All</button>
@@ -204,6 +212,49 @@
                         <button id="copyTemplateBtn" class="secondary-btn full-width" style="margin-top: 8px;">Copy Format Template</button>
                         <div id="importStatus" class="status-msg"></div>
                     </div>
+                </div>
+
+                <div id="outputTab" class="tab-content">
+                    <section class="control-group">
+                        <h3>Export Settings</h3>
+                        <div class="control">
+                            <label for="exportFormat">Format</label>
+                            <select id="exportFormat" class="custom-select">
+                                <option value="jpeg">JPEG</option>
+                                <option value="png">PNG</option>
+                                <option value="webp">WEBP</option>
+                            </select>
+                        </div>
+                        <div class="control">
+                            <label>Quality</label>
+                            <div class="numeric-control">
+                                <button type="button" class="step-btn export-step minus" data-export-param="quality">-</button>
+                                <input id="exportQuality" type="number" min="1" max="100" step="1" value="95">
+                                <button type="button" class="step-btn export-step plus" data-export-param="quality">+</button>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <label>Width</label>
+                            <div class="numeric-control">
+                                <button type="button" class="step-btn export-step minus" data-export-param="width">-</button>
+                                <input id="exportWidth" type="number" min="1" step="10" placeholder="Original">
+                                <button type="button" class="step-btn export-step plus" data-export-param="width">+</button>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <label>Height</label>
+                            <div class="numeric-control">
+                                <button type="button" class="step-btn export-step minus" data-export-param="height">-</button>
+                                <input id="exportHeight" type="number" min="1" step="10" placeholder="Original">
+                                <button type="button" class="step-btn export-step plus" data-export-param="height">+</button>
+                            </div>
+                        </div>
+                        <label class="checkbox-row">
+                            <input id="lockAspect" type="checkbox" checked>
+                            <span>Lock aspect ratio</span>
+                        </label>
+                        <button id="useOriginalSizeBtn" class="secondary-btn full-width">Use Original Size</button>
+                    </section>
                 </div>
             </div>
 
@@ -231,6 +282,9 @@
                         <button id="flipVertical" class="icon-btn" title="Flip Vertical">↕</button>
                         <button id="cropBtn" class="icon-btn" title="Crop">✂️</button>
                     </div>
+                    <div class="view-controls">
+                        <button id="compareBtn" class="secondary-btn mini" disabled>Compare</button>
+                    </div>
                     <div class="history-controls">
                         <button id="undoBtn" class="secondary-btn mini" disabled>Undo</button>
                         <button id="redoBtn" class="secondary-btn mini" disabled>Redo</button>
@@ -243,12 +297,20 @@
                         <p>Drag an image here to start</p>
                     </div>
                     <img id="mainPreview" style="max-width: 100%; max-height: 100%; object-fit: contain; display: none;">
+                    <div id="compareLayer" class="compare-layer" style="display: none;">
+                        <img id="originalPreview" alt="Original preview">
+                    </div>
+                    <input id="compareSlider" class="compare-slider" type="range" min="0" max="100" value="50" aria-label="Before after split" style="display: none;">
                     
                     <!-- Loading Overlay -->
                     <div id="loadingOverlay" class="loading-overlay" style="display: none;">
                         <div class="spinner"></div>
                         <p>Processing...</p>
                     </div>
+                </div>
+                <div class="analysis-strip">
+                    <div id="imageMeta" class="image-meta">No image loaded</div>
+                    <canvas id="histogramCanvas" width="260" height="72" aria-label="Image histogram"></canvas>
                 </div>
             </div>
 

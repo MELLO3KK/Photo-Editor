@@ -1,8 +1,10 @@
+import io
 import os
 import uuid
-from flask import Flask, render_template, request, jsonify, send_from_directory, session
+from flask import Flask, render_template, request, jsonify, session
 from werkzeug.utils import secure_filename
 from processor import ImageProcessor
+from PIL import Image
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -10,10 +12,85 @@ app.secret_key = os.urandom(24)
 # In-memory storage for images (filename: bytes)
 image_store = {}
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
+EXPORT_FORMATS = {
+    'jpeg': ('JPEG', 'image/jpeg', 'jpg'),
+    'jpg': ('JPEG', 'image/jpeg', 'jpg'),
+    'png': ('PNG', 'image/png', 'png'),
+    'webp': ('WEBP', 'image/webp', 'webp'),
+}
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def image_mimetype(filename):
+    ext = filename.rsplit('.', 1)[-1].lower() if '.' in filename else 'jpg'
+    return EXPORT_FORMATS.get(ext, EXPORT_FORMATS['jpg'])[1]
+
+def normalize_settings(settings):
+    defaults = ImageProcessor.get_default_settings()
+    normalized = {**defaults, **(settings or {})}
+
+    for key, default_value in defaults.items():
+        if key == 'crop':
+            continue
+        if isinstance(default_value, bool):
+            normalized[key] = bool(normalized.get(key))
+            continue
+        try:
+            normalized[key] = float(normalized[key])
+        except (ValueError, TypeError, KeyError):
+            normalized[key] = default_value
+
+    return normalized
+
+def resize_to_fit(image, export_options):
+    width = export_options.get('width')
+    height = export_options.get('height')
+    try:
+        width = int(width) if width not in (None, '') else None
+        height = int(height) if height not in (None, '') else None
+    except (ValueError, TypeError):
+        return image
+
+    if (width is None or width <= 0) and (height is None or height <= 0):
+        return image
+
+    original_width, original_height = image.size
+    if width is None or width <= 0:
+        ratio = height / original_height
+        width = max(1, round(original_width * ratio))
+    elif height is None or height <= 0:
+        ratio = width / original_width
+        height = max(1, round(original_height * ratio))
+
+    return image.resize((max(1, width), max(1, height)), Image.Resampling.LANCZOS)
+
+def serialize_image(image, export_options=None):
+    export_options = export_options or {}
+    requested = str(export_options.get('format', 'jpeg')).lower()
+    format_name, mimetype, extension = EXPORT_FORMATS.get(requested, EXPORT_FORMATS['jpeg'])
+
+    image = resize_to_fit(image, export_options)
+    if format_name in {'JPEG', 'WEBP'} and image.mode != 'RGB':
+        image = image.convert('RGB')
+
+    try:
+        quality = int(export_options.get('quality', 95))
+    except (ValueError, TypeError):
+        quality = 95
+    quality = min(100, max(1, quality))
+
+    img_io = io.BytesIO()
+    save_kwargs = {}
+    if format_name in {'JPEG', 'WEBP'}:
+        save_kwargs['quality'] = quality
+    if format_name == 'JPEG':
+        save_kwargs['optimize'] = True
+
+    image.save(img_io, format_name, **save_kwargs)
+    img_io.seek(0)
+    return img_io, mimetype, extension
 
 @app.route('/')
 def index():
@@ -63,24 +140,13 @@ def upload_file():
 
 @app.route('/process', methods=['POST'])
 def process_image():
-    data = request.json
-    settings = data.get('settings', {})
-    
-    # Normalize settings
-    defaults = ImageProcessor.get_default_settings()
-    for k in defaults:
-        if k in settings and k != 'crop':
-            try:
-                settings[k] = float(settings[k])
-            except (ValueError, TypeError):
-                pass
+    data = request.json or {}
+    settings = normalize_settings(data.get('settings', {}))
     
     original_filename = session.get('original_file')
     if not original_filename or original_filename not in image_store:
         return jsonify({'error': 'No image found'}), 404
         
-    import io
-    from PIL import Image
     original_img = Image.open(io.BytesIO(image_store[original_filename]))
     
     # Process the image
@@ -91,8 +157,7 @@ def process_image():
     # We'll generate a temporary UUID for the processed image in memory.
     processed_filename = f"proc_{uuid.uuid4()}.jpg"
     
-    img_io = io.BytesIO()
-    processed_img.save(img_io, 'JPEG', quality=95)
+    img_io, _, _ = serialize_image(processed_img, {'format': 'jpeg', 'quality': 95})
     image_store[processed_filename] = img_io.getvalue()
     
     # Track this filename in session to allow access
@@ -110,16 +175,32 @@ def process_image():
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     # Security: Ensure the image belongs to the current session
-    allowed_images = session.get('history', [])
+    allowed_images = list(session.get('history', []))
     if session.get('original_file'):
         allowed_images.append(session.get('original_file'))
         
     if filename not in image_store or filename not in allowed_images:
         return "Not found or unauthorized", 404
     
-    import io
     from flask import send_file
-    return send_file(io.BytesIO(image_store[filename]), mimetype='image/jpeg')
+    return send_file(io.BytesIO(image_store[filename]), mimetype=image_mimetype(filename))
+
+@app.route('/metadata')
+def image_metadata():
+    filename = session.get('original_file')
+    if not filename or filename not in image_store:
+        return jsonify({'error': 'No image uploaded'}), 400
+
+    img = Image.open(io.BytesIO(image_store[filename]))
+    return jsonify({
+        'filename': filename,
+        'width': img.width,
+        'height': img.height,
+        'format': img.format or filename.rsplit('.', 1)[-1].upper(),
+        'mode': img.mode,
+        'megapixels': round((img.width * img.height) / 1_000_000, 2),
+        'file_size': len(image_store[filename]),
+    })
 
 @app.route('/preview')
 def preview_image():
@@ -157,43 +238,36 @@ def preview_image():
             except (ValueError, TypeError):
                 pass
     
-    import io
-    from PIL import Image
     original_img = Image.open(io.BytesIO(image_store[filename]))
     processed_img = ImageProcessor.apply_adjustments(original_img, settings)
     
     # Return image directly
     from flask import send_file
-    img_io = io.BytesIO()
-    processed_img.save(img_io, 'JPEG', quality=95)
-    img_io.seek(0)
-    return send_file(img_io, mimetype='image/jpeg')
+    img_io, mimetype, _ = serialize_image(processed_img, {'format': 'jpeg', 'quality': 95})
+    return send_file(img_io, mimetype=mimetype)
 
 @app.route('/export', methods=['POST'])
 def export_image():
-    data = request.json
-    settings = data.get('settings', {})
+    data = request.json or {}
+    settings = normalize_settings(data.get('settings', {}))
+    export_options = data.get('export_options', {})
     filename = session.get('original_file')
     
     if not filename or filename not in image_store:
         return jsonify({'error': 'No image to export'}), 400
         
-    import io
-    from PIL import Image
     from flask import send_file
     
     original_img = Image.open(io.BytesIO(image_store[filename]))
     processed_img = ImageProcessor.apply_adjustments(original_img, settings)
     
-    img_io = io.BytesIO()
-    processed_img.save(img_io, 'JPEG', quality=100)
-    img_io.seek(0)
+    img_io, mimetype, extension = serialize_image(processed_img, export_options)
     
     return send_file(
         img_io,
-        mimetype='image/jpeg',
+        mimetype=mimetype,
         as_attachment=True,
-        download_name='edited_image.jpg'
+        download_name=f'edited_image.{extension}'
     )
 
 @app.route('/clear', methods=['POST'])
