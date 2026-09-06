@@ -157,7 +157,7 @@ def process_image():
     # We'll generate a temporary UUID for the processed image in memory.
     processed_filename = f"proc_{uuid.uuid4()}.jpg"
     
-    img_io, _, _ = serialize_image(processed_img, {'format': 'jpeg', 'quality': 95})
+    img_io, _, _ = serialize_image(processed_img, {'format': 'jpeg', 'quality': 92})
     image_store[processed_filename] = img_io.getvalue()
     
     # Track this filename in session to allow access
@@ -241,9 +241,9 @@ def preview_image():
     original_img = Image.open(io.BytesIO(image_store[filename]))
     processed_img = ImageProcessor.apply_adjustments(original_img, settings)
     
-    # Return image directly
+    # Return image directly with optimized quality for faster previews
     from flask import send_file
-    img_io, mimetype, _ = serialize_image(processed_img, {'format': 'jpeg', 'quality': 95})
+    img_io, mimetype, _ = serialize_image(processed_img, {'format': 'jpeg', 'quality': 85})
     return send_file(img_io, mimetype=mimetype)
 
 @app.route('/export', methods=['POST'])

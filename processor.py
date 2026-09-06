@@ -80,17 +80,7 @@ class ImageProcessor:
             b_val = settings['blacks'] / 1000.0
             arr = arr + (lumi < 0.3) * (b_val * 0.1)
 
-        # --- 3.5 RGB Channel Gains ---
-        if any(k in settings for k in ['red', 'green', 'blue']):
-            r_gain = settings.get('red', 500.0) / 500.0
-            g_gain = settings.get('green', 500.0) / 500.0
-            b_gain = settings.get('blue', 500.0) / 500.0
-            
-            arr[:,:,0] *= r_gain
-            arr[:,:,1] *= g_gain
-            arr[:,:,2] *= b_gain
-
-        # Clip after additions and gains
+        # Clip after additions
         arr = np.clip(arr, 0, 1)
 
         # --- 4. Presence: Vibrance, Clarity, Dehaze ---
@@ -137,18 +127,47 @@ class ImageProcessor:
             enhancer_s = ImageEnhance.Color(img)
             img = enhancer_s.enhance(1.0 + dehaze_val * 0.1)
 
-        # RGB Channel Gains
+        # --- 3.5 RGB Channel Gains (applied once at the end for consistency) ---
+        # Note: We apply RGB gains after all other adjustments for accurate color grading
         if any(k in settings for k in ['red', 'green', 'blue']):
             r_gain = settings.get('red', 500.0) / 500.0
             g_gain = settings.get('green', 500.0) / 500.0
             b_gain = settings.get('blue', 500.0) / 500.0
             
-            r, g, b = img.split()
-            r = r.point(lambda i: i * r_gain)
-            g = g.point(lambda i: i * g_gain)
-            b = b.point(lambda i: i * b_gain)
-            img = Image.merge('RGB', (r, g, b))
-            
+            arr = np.array(img).astype(np.float32) / 255.0
+            arr[:,:,0] *= r_gain
+            arr[:,:,1] *= g_gain
+            arr[:,:,2] *= b_gain
+            arr = np.clip(arr, 0, 1)
+            img = Image.fromarray((arr * 255).astype(np.uint8))
+
+        # --- 4.5 Vignette Effect ---
+        if 'vignette' in settings and settings['vignette'] != 0:
+            arr_v = np.array(img).astype(np.float32) / 255.0
+            v_amount = settings['vignette'] / 1000.0
+            h, w = arr_v.shape[:2]
+            y, x = np.ogrid[:h, :w]
+            cx, cy = w / 2, h / 2
+            radius = min(h, w) / 2
+            dist = np.sqrt((x - cx)**2 + (y - cy)**2) / radius
+            vignette_mask = np.clip(1 - dist * v_amount * 0.7, 0, 1)
+            vignette_mask = np.stack([vignette_mask, vignette_mask, vignette_mask], axis=-1)
+            arr_v = arr_v * vignette_mask
+            img = Image.fromarray((np.clip(arr_v, 0, 1) * 255).astype(np.uint8))
+
+        # --- 4.6 Sepia Tone Effect ---
+        if 'sepia' in settings and settings['sepia'] != 0:
+            arr_s = np.array(img).astype(np.float32) / 255.0
+            sepia_amount = settings['sepia'] / 1000.0
+            sepia_matrix = np.array([
+                [0.393, 0.769, 0.189],
+                [0.349, 0.686, 0.168],
+                [0.272, 0.534, 0.131]
+            ])
+            sepia_img = np.dot(arr_s, sepia_matrix.T)
+            sepia_img = np.clip(sepia_img, 0, 1)
+            img = Image.fromarray(((arr_s * (1 - sepia_amount) + sepia_img * sepia_amount) * 255).astype(np.uint8))
+
         # Sharpness
         if 'sharpness' in settings and settings['sharpness'] != 100.0:
             enhancer = ImageEnhance.Sharpness(img)
@@ -196,7 +215,9 @@ class ImageProcessor:
             'flip_h': False,
             'flip_v': False,
             'sharpness': 100,
-            'crop': None
+            'crop': None,
+            'vignette': 0,
+            'sepia': 0
         }
 
     @staticmethod
