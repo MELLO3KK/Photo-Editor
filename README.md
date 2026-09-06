@@ -1,4 +1,4 @@
-# 📸 PhotoEditor Pro - Professional Lightroom-Style Web Editor
+# PhotoEditor Pro - Professional Lightroom-Style Web Editor
 
 ![PhotoEditor Pro](https://img.shields.io/badge/PhotoEditor-Pro-blue?style=for-the-badge&logo=adobephotoshop)
 ![Flask](https://img.shields.io/badge/Flask-3.0-green?style=for-the-badge&logo=flask)
@@ -23,11 +23,15 @@ Powered by **NumPy** and **PIL** for lossless precision processing:
     - **Clarity**: Local contrast enhancement using Gaussian-blurred masks.
     - **Dehaze**: Atmospheric scattering correction.
     - **Sharpness**: High-frequency detail reinforcement.
+- **Creative Effects** *(NEW)*:
+    - **Vignette**: Radial darkening effect to draw focus to the center of your image.
+    - **Sepia**: Classic warm-toned vintage film look with adjustable intensity.
 
 ### 📋 Preset Management System
 - **Preset Library**: Instant application of complex adjustment stacks.
 - **Bulk Import/Export**: Highly portable JSON-based preset format.
 - **Format Template**: Built-in template generator for creating custom preset packs.
+- **Built-in Presets**: Includes "Neon Nights", "Desert Sun", "Moody Forest", and "Vintage Film" presets.
 
 ### ⚙️ Hybrid UX & Synchronization
 - **Real-time Sync**: Bi-directional synchronization between UI sliders and a raw JSON configuration editor (powered by **CodeMirror**).
@@ -112,10 +116,31 @@ Presets use a flat JSON structure for maximum portability:
     "exposure": 30,
     "contrast": 210,
     "temperature": 150,
-    "vibrance": 40
+    "vibrance": 40,
+    "sepia": 0,
+    "vignette": 0
   }
 }
 ```
 
 ---
+
+## 🔧 Recent Improvements
+
+### Performance Optimizations
+- **Faster Previews**: Reduced preview JPEG quality to 85% for quicker loading without visible quality loss.
+- **Optimized Process Exports**: Set process view quality to 92% for better balance between speed and fidelity.
+- **Efficient RGB Processing**: Consolidated RGB channel gains into a single NumPy operation for faster color grading.
+
+### Bug Fixes
+- Fixed duplicate RGB channel application that could cause unexpected color shifts.
+- Corrected syntax error in vignette calculation formula.
+
+### New Features
+- Added **Vignette** effect for creative edge darkening.
+- Added **Sepia** tone effect for vintage looks.
+- Added "Vintage Film" preset showcasing new creative effects.
+
+---
+
 *Built with precision for photographers and developers.*

@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
         temperature: 0, tint: 0, vibrance: 0, saturation: 200,
         clarity: 0, dehaze: 0,
         red: 500, green: 500, blue: 500,
-        rotation: 0, flip_h: false, flip_v: false, sharpness: 100, crop: null
+        rotation: 0, flip_h: false, flip_v: false, sharpness: 100, crop: null,
+        vignette: 0, sepia: 0
     };
     const PRESETS_STORAGE_KEY = 'photoEditor.presets.v2';
 
@@ -38,6 +39,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 highlights: -80, shadows: 60, whites: -10, blacks: 20,
                 temperature: 20, tint: -40, vibrance: -20, saturation: 160,
                 clarity: 25
+            }
+        },
+        {
+            name: "Vintage Film",
+            desc: "Classic film look with warm sepia and vignette",
+            settings: {
+                exposure: -10, contrast: 180, brightness: 190,
+                temperature: 80, vibrance: -30, saturation: 170,
+                sepia: 400, vignette: 350, clarity: 10
             }
         },
         {
